@@ -1,0 +1,71 @@
+# GSPO (Group Sequence Policy Optimization) Training Configuration
+# Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
+# Optimized for MoE models like Qwen3-MoE
+
+### Model configuration
+model_name_or_path: Qwen/Qwen2.5-32B-Instruct  # Replace with MoE variant if available
+template: qwen
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters
+gspo_group_size: 8              # Group size for sequence-level optimization
+gspo_beta: 0.1                  # Beta coefficient for GSPO loss
+gspo_clip_epsilon: 0.2          # Clipping epsilon for importance ratios
+gspo_sequence_level: true       # Use sequence-level optimization (recommended)
+gspo_normalize_rewards: true    # Normalize rewards within groups
+gspo_moe_stabilization: true    # Enable MoE stabilization for Mixture-of-Experts
+
+### Dataset configuration
+dataset: alpaca_gpt4_en         # Replace with your preference dataset
+dataset_dir: data
+cutoff_len: 2048               # Longer context for sequence-level optimization
+overwrite_cache: true
+
+### LoRA configuration (larger rank for MoE)
+lora_rank: 16
+lora_alpha: 32
+lora_dropout: 0.1
+lora_target: all
+
+### Training hyperparameters
+per_device_train_batch_size: 2  # Smaller batch for large MoE model
+gradient_accumulation_steps: 8
+learning_rate: 2.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 7200              # Longer timeout for MoE models
+gradient_checkpointing: true    # Enable for memory efficiency
+
+### Generation configuration
+max_new_tokens: 512
+temperature: 0.9
+top_p: 0.9
+do_sample: true
+
+### Evaluation configuration
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 100
+
+### Logging and saving
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+output_dir: saves/qwen3-moe-gspo
+
+### Reporting
+report_to: tensorboard
+
+### Notes
+# GSPO advantages for MoE models:
+# 1. Sequence-level optimization provides better stability
+# 2. Eliminates expert-activation volatility issues
+# 3. No need for complex stabilization techniques like Routing Replay
+# 4. Superior performance vs GRPO for large-scale training
+# 5. Powers the Qwen3 family (Instruct, Coder, Thinking)

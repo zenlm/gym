@@ -5,7 +5,9 @@
       "mcp__hanzo__read",
       "mcp__hanzo__edit",
       "mcp__hanzo__run",
-      "mcp__hanzo__write"
+      "mcp__hanzo__write",
+      "WebSearch",
+      "mcp__hanzo__directory_tree"
     ],
     "deny": [],
     "ask": []

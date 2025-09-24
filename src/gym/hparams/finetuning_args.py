@@ -257,6 +257,48 @@ class RLHFArguments:
             )
         },
     )
+    # GRPO parameters
+    grpo_group_size: int = field(
+        default=8,
+        metadata={"help": "Group size for relative advantage computation in GRPO training."},
+    )
+    grpo_beta: float = field(
+        default=0.1,
+        metadata={"help": "Beta coefficient for GRPO loss."},
+    )
+    grpo_clip_range: float = field(
+        default=0.2,
+        metadata={"help": "Clipping range for importance ratios in GRPO."},
+    )
+    grpo_normalize_advantages: bool = field(
+        default=True,
+        metadata={"help": "Whether to normalize advantages within groups in GRPO."},
+    )
+    # GSPO parameters
+    gspo_group_size: int = field(
+        default=8,
+        metadata={"help": "Group size for sequence-level optimization in GSPO training."},
+    )
+    gspo_beta: float = field(
+        default=0.1,
+        metadata={"help": "Beta coefficient for GSPO loss."},
+    )
+    gspo_clip_epsilon: float = field(
+        default=0.2,
+        metadata={"help": "Clipping epsilon for importance ratios in GSPO."},
+    )
+    gspo_sequence_level: bool = field(
+        default=True,
+        metadata={"help": "Whether to use sequence-level optimization in GSPO (recommended)."},
+    )
+    gspo_normalize_rewards: bool = field(
+        default=True,
+        metadata={"help": "Whether to normalize rewards within groups in GSPO."},
+    )
+    gspo_moe_stabilization: bool = field(
+        default=True,
+        metadata={"help": "Whether to enable MoE stabilization in GSPO for Mixture-of-Experts models."},
+    )
 
 
 @dataclass
@@ -457,7 +499,7 @@ class FinetuningArguments(
         default=False,
         metadata={"help": "Whether or not to train model in purely bf16 precision (without AMP)."},
     )
-    stage: Literal["pt", "sft", "rm", "ppo", "dpo", "kto"] = field(
+    stage: Literal["pt", "sft", "rm", "ppo", "dpo", "kto", "grpo", "gspo"] = field(
         default="sft",
         metadata={"help": "Which stage will be performed in training."},
     )
