@@ -23,14 +23,14 @@ USAGE = (
     "-" * 70
     + "\n"
     + "| Usage:                                                             |\n"
-    + "|   llamafactory-cli api -h: launch an OpenAI-style API server       |\n"
-    + "|   llamafactory-cli chat -h: launch a chat interface in CLI         |\n"
-    + "|   llamafactory-cli eval -h: evaluate models                        |\n"
-    + "|   llamafactory-cli export -h: merge LoRA adapters and export model |\n"
-    + "|   llamafactory-cli train -h: train models                          |\n"
-    + "|   llamafactory-cli webchat -h: launch a chat interface in Web UI   |\n"
-    + "|   llamafactory-cli webui: launch LlamaBoard                        |\n"
-    + "|   llamafactory-cli version: show version info                      |\n"
+    + "|   gym-cli api -h: launch an OpenAI-style API server                |\n"
+    + "|   gym-cli chat -h: launch a chat interface in CLI                  |\n"
+    + "|   gym-cli eval -h: evaluate models                                 |\n"
+    + "|   gym-cli export -h: merge LoRA adapters and export model          |\n"
+    + "|   gym-cli train -h: train models (SFT/DPO/PPO/GRPO/GSPO)           |\n"
+    + "|   gym-cli webchat -h: launch a chat interface in Web UI            |\n"
+    + "|   gym-cli webui: launch GymBoard                                   |\n"
+    + "|   gym-cli version: show version info                               |\n"
     + "-" * 70
 )
 
@@ -51,12 +51,12 @@ def main():
     WELCOME = (
         "-" * 58
         + "\n"
-        + f"| Welcome to LLaMA Factory, version {VERSION}"
-        + " " * (21 - len(VERSION))
+        + f"| Welcome to Gym by Zoo Labs, version {VERSION}"
+        + " " * (15 - len(VERSION))
         + "|\n|"
         + " " * 56
         + "|\n"
-        + "| Project page: https://github.com/hiyouga/LLaMA-Factory |\n"
+        + "| Project page: https://github.com/zooai/gym             |\n"
         + "-" * 58
     )
 

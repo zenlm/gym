@@ -1,0 +1,67 @@
+# GRPO (Group Relative Policy Optimization) Training Configuration
+# Based on DeepSeek's GRPO: https://arxiv.org/abs/2502.01155
+# Memory-efficient alternative to PPO (40-60% less memory)
+
+### Model configuration
+model_name_or_path: Qwen/Qwen2.5-7B-Instruct
+template: qwen
+
+### Training method
+stage: grpo
+finetuning_type: lora
+use_ref_model: true
+
+### GRPO specific parameters
+grpo_group_size: 8              # Size of groups for relative advantage computation
+grpo_beta: 0.1                  # Beta coefficient for GRPO loss
+grpo_clip_range: 0.2            # Clipping range for importance ratios
+grpo_normalize_advantages: true  # Normalize advantages within groups
+
+### Dataset configuration
+dataset: alpaca_gpt4_en         # Replace with your preference dataset
+dataset_dir: data
+cutoff_len: 1024
+overwrite_cache: true
+
+### LoRA configuration
+lora_rank: 8
+lora_alpha: 16
+lora_dropout: 0.1
+lora_target: all
+
+### Training hyperparameters
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 5.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 3600
+
+### Generation configuration
+max_new_tokens: 512
+temperature: 0.9
+top_p: 0.9
+do_sample: true
+
+### Evaluation configuration
+per_device_eval_batch_size: 8
+eval_strategy: steps
+eval_steps: 100
+
+### Logging and saving
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+output_dir: saves/qwen3-7b-grpo
+
+### Reporting
+report_to: tensorboard
+
+### Notes
+# GRPO advantages over PPO:
+# 1. No value network needed (40-60% memory reduction)
+# 2. Group-based advantage estimation
+# 3. Better training stability
+# 4. Used successfully in DeepSeek R1 model
