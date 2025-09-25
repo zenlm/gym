@@ -12,10 +12,6 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  experimental: {
-    // Enable React 19 RC features
-    reactCompiler: true,
-  },
 }
 
 module.exports = nextConfig
