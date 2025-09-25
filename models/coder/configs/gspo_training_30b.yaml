@@ -3,7 +3,7 @@
 # Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen3-Coder-30B-A3B-Instruct  # Qwen3-Coder: 30B total, 3.3B active
+model_name_or_path: Qwen/Qwen3-Coder-30B-A3B-Instruct  # REAL Qwen3-Coder: 30B total, 3B active
 template: qwen3-coder
 model_type: coder-moe
 
@@ -66,5 +66,5 @@ report_to: tensorboard
 ### Notes
 # This is the standard Zen Coder model (30B MoE)
 # Offers excellent balance of performance and efficiency
-# Only 3.3B parameters active per token
+# Only 3B parameters active per token
 # Great for production code generation workloads

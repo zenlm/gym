@@ -3,7 +3,7 @@
 # Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen3-Next-80B-A3B-Instruct  # Qwen3-Next: 80B total, 3B active, hybrid attention
+model_name_or_path: Qwen/Qwen3-Next-80B-A3B-Instruct  # REAL Qwen3-Next: 80B total, 3B active
 template: qwen3-next
 model_type: next-gen
 
@@ -18,7 +18,7 @@ gspo_beta: 0.12
 gspo_clip_epsilon: 0.2
 gspo_sequence_level: true
 gspo_normalize_rewards: true
-gspo_moe_stabilization: true    # Ultra-sparse MoE: 512 experts, 10+1 active
+gspo_moe_stabilization: true    # Qwen3-Next hybrid architecture with 80B/3B active
 
 ### Next-gen architecture features
 use_sliding_window_attention: true     # Sliding window for efficiency
