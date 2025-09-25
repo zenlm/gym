@@ -34,10 +34,7 @@ def get_requires() -> list[str]:
 
 
 def get_console_scripts() -> list[str]:
-    console_scripts = ["gym-cli = gym.cli:main"]
-    if os.getenv("ENABLE_SHORT_CONSOLE", "1").lower() in ["true", "y", "1"]:
-        console_scripts.append("gym = gym.cli:main")
-
+    console_scripts = ["gym = gym.cli:main"]
     return console_scripts
 
 

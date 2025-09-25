@@ -1,0 +1,69 @@
+# GSPO Training for Qwen3-Coder-30B-A3B-Thinking (Zen Coder Thinking)
+# Code generation with visible reasoning process
+# Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
+
+### Model configuration
+model_name_or_path: Qwen/Qwen3-Coder-30B-A3B-Thinking  # Thinking variant with CoT
+template: qwen3-coder-thinking
+model_type: coder-moe-thinking
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (optimized for reasoning)
+gspo_group_size: 8              # Smaller groups for reasoning chains
+gspo_beta: 0.15                 # Higher beta for thinking stability
+gspo_clip_epsilon: 0.25
+gspo_sequence_level: true       # Essential for multi-step reasoning
+gspo_normalize_rewards: true
+gspo_moe_stabilization: true
+
+### Thinking-specific configuration
+enable_thinking_mode: true      # Enable chain-of-thought
+thinking_max_length: 32768      # Max thinking tokens
+thinking_temperature: 0.8       # Slightly higher for exploration
+separate_thinking_loss: true    # Separate loss for thinking tokens
+
+### Dataset configuration
+dataset: code_alpaca_thinking   # Dataset with reasoning traces
+dataset_dir: data
+cutoff_len: 65536              # Longer for reasoning chains
+overwrite_cache: true
+
+### LoRA configuration
+lora_rank: 48                  # Higher rank for complex reasoning
+lora_alpha: 96
+lora_dropout: 0.05
+lora_target: all
+
+### Training hyperparameters
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+learning_rate: 1.5e-5
+num_train_epochs: 2
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+
+### Generation configuration
+max_new_tokens: 8192           # Longer for reasoning
+temperature: 0.7
+top_p: 0.95
+do_sample: true
+
+### Evaluation
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 100
+
+### Logging and saving
+logging_steps: 10
+save_steps: 500
+output_dir: saves/qwen3-coder-30b-thinking
+
+### Notes
+# Thinking mode shows step-by-step reasoning
+# Excellent for complex debugging and algorithm design
+# Trades speed for accuracy and explainability

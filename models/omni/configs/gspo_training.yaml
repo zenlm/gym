@@ -3,7 +3,7 @@
 # Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen3-Omni-7B  # Multimodal Qwen3 variant
+model_name_or_path: Qwen/Qwen3-Omni-30B-A3B-Instruct  # Qwen3-Omni: 30B total, 3B active
 template: qwen3-omni
 model_type: multimodal
 
@@ -18,7 +18,7 @@ gspo_beta: 0.08                 # Lower beta for multimodal stability
 gspo_clip_epsilon: 0.15         # Tighter clipping for multimodal
 gspo_sequence_level: true       
 gspo_normalize_rewards: true
-gspo_moe_stabilization: false
+gspo_moe_stabilization: true    # MoE architecture for multimodal
 
 ### Multimodal configuration
 freeze_vision_tower: false      # Train vision components

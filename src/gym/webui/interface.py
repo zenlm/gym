@@ -1,4 +1,4 @@
-# Copyright 2025 the LlamaFactory team.
+# Copyright 2025 Zoo Labs Foundation Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ def create_ui(demo_mode: bool = False) -> "gr.Blocks":
     engine = Engine(demo_mode=demo_mode, pure_chat=False)
     hostname = os.getenv("HOSTNAME", os.getenv("COMPUTERNAME", platform.node())).split(".")[0]
 
-    with gr.Blocks(title=f"LLaMA Factory ({hostname})", css=CSS) as demo:
+    with gr.Blocks(title=f"Gym by Zoo Labs ({hostname})", css=CSS) as demo:
         title = gr.HTML()
         subtitle = gr.HTML()
         if demo_mode:

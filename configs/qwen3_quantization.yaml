@@ -1,0 +1,70 @@
+# Qwen3 Dynamic Quantization Configuration
+# Optimized for memory efficiency with Unsloth-style optimizations
+# Zoo Labs Foundation - Gym Platform
+
+### Quantization Options for Qwen3 Models
+
+## 4-bit Quantization (Recommended for most users)
+quantization_bit: 4
+quantization_method: bnb  # BitsAndBytes
+load_in_4bit: true
+bnb_4bit_compute_dtype: bfloat16
+bnb_4bit_use_double_quant: true  # Double quantization for extra memory savings
+bnb_4bit_quant_type: nf4  # NormalFloat4 - best for models
+
+## 8-bit Quantization (Better precision, more memory)
+# quantization_bit: 8
+# quantization_method: bnb
+# load_in_8bit: true
+
+## Unsloth Optimizations (Enable for faster training)
+use_unsloth: true  # Enable Unsloth optimizations
+use_unsloth_gc: true  # Unsloth gradient checkpointing
+enable_liger_kernel: true  # Liger kernel for speed
+
+## Model-Specific Settings
+
+### For Zen Nano (0.6B) - Can run full precision
+# quantization_bit: null  # No quantization needed
+
+### For Zen Eco (4B) - 8-bit recommended
+# quantization_bit: 8
+# load_in_8bit: true
+
+### For Zen Coder (30B/480B) - 4-bit required
+# quantization_bit: 4
+# bnb_4bit_use_double_quant: true
+
+### For Zen Omni (30B) - 4-bit with compute optimization
+# quantization_bit: 4
+# bnb_4bit_compute_dtype: float16  # For multimodal stability
+
+### For Zen Next (80B) - Aggressive quantization
+# quantization_bit: 4
+# bnb_4bit_use_double_quant: true
+# bnb_4bit_quant_storage: uint8  # Further compression
+
+## Memory Optimization Settings
+gradient_checkpointing: true
+gradient_accumulation_steps: 8  # Simulate larger batch
+mixed_precision_training: bf16
+optim: paged_adamw_32bit  # Paged optimizer for memory efficiency
+
+## Flash Attention (For Qwen3 architecture)
+use_flash_attention: true
+flash_attention_version: 2
+
+## CPU Offloading (For very large models)
+# cpu_offloading: true
+# offload_optimizer: true
+# offload_param: true
+
+## Activation Checkpointing
+activation_checkpointing: true
+activation_checkpointing_recompute: true
+
+## Notes:
+# - 4-bit quantization reduces memory by ~75% with ~1-2% accuracy loss
+# - Unsloth optimizations can provide 2-3x speedup
+# - Double quantization saves additional 0.4GB per billion parameters
+# - Liger kernel requires compatible GPU (Ampere or newer)

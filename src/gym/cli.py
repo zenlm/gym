@@ -23,14 +23,14 @@ USAGE = (
     "-" * 70
     + "\n"
     + "| Usage:                                                             |\n"
-    + "|   gym-cli api -h: launch an OpenAI-style API server                |\n"
-    + "|   gym-cli chat -h: launch a chat interface in CLI                  |\n"
-    + "|   gym-cli eval -h: evaluate models                                 |\n"
-    + "|   gym-cli export -h: merge LoRA adapters and export model          |\n"
-    + "|   gym-cli train -h: train models (SFT/DPO/PPO/GRPO/GSPO)           |\n"
-    + "|   gym-cli webchat -h: launch a chat interface in Web UI            |\n"
-    + "|   gym-cli webui: launch GymBoard                                   |\n"
-    + "|   gym-cli version: show version info                               |\n"
+    + "|   gym api -h: launch an OpenAI-style API server                    |\n"
+    + "|   gym chat -h: launch a chat interface in CLI                      |\n"
+    + "|   gym eval -h: evaluate models                                     |\n"
+    + "|   gym export -h: merge LoRA adapters and export model              |\n"
+    + "|   gym train -h: train models (SFT/DPO/PPO/GRPO/GSPO)               |\n"
+    + "|   gym webchat -h: launch a chat interface in Web UI                |\n"
+    + "|   gym webui: launch GymBoard                                       |\n"
+    + "|   gym version: show version info                                   |\n"
     + "-" * 70
 )
 
