@@ -778,5 +778,9 @@
       "user_tag": "user",
       "assistant_tag": "assistant"
     }
+  },
+  "zen-nano-instruct-v1.0.1_training": {
+    "file_name": "zen-nano-instruct-v1.0.1_training.json",
+    "formatting": "alpaca"
   }
 }

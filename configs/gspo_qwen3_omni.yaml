@@ -1,0 +1,87 @@
+# GSPO Training for Qwen3-Omni (Multimodal) Models
+# Configuration for vision-language-audio understanding
+# Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
+
+### Model configuration
+model_name_or_path: Qwen/Qwen3-Omni-7B  # Multimodal Qwen3 variant
+template: qwen3-omni
+model_type: multimodal
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (multimodal-optimized)
+gspo_group_size: 4              # Smaller groups due to multimodal complexity
+gspo_beta: 0.08                 # Lower beta for multimodal stability
+gspo_clip_epsilon: 0.15         # Tighter clipping for multimodal
+gspo_sequence_level: true       
+gspo_normalize_rewards: true
+gspo_moe_stabilization: false
+
+### Multimodal configuration
+freeze_vision_tower: false      # Train vision components
+freeze_language_model: false    # Train language components
+freeze_audio_encoder: true      # Keep audio encoder frozen initially
+vision_resolution: 336          # Vision input resolution
+audio_sampling_rate: 16000      # Audio sampling rate
+
+### Dataset configuration
+dataset: multimodal_instruct    # Multimodal dataset
+dataset_dir: data
+cutoff_len: 1536               # Balance between modalities
+overwrite_cache: true
+preprocessing_num_workers: 4
+
+### LoRA configuration (multimodal)
+lora_rank: 32                  # Higher rank for cross-modal understanding
+lora_alpha: 64
+lora_dropout: 0.1
+lora_target: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+additional_target: ["vision_projector", "audio_projector"]  # Multimodal projectors
+
+### Training hyperparameters
+per_device_train_batch_size: 1  # Very small batch for multimodal
+gradient_accumulation_steps: 16
+learning_rate: 1.0e-5           # Lower LR for multimodal
+num_train_epochs: 2
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+gradient_checkpointing: true
+ddp_find_unused_parameters: true  # For multimodal modules
+
+### Generation configuration
+max_new_tokens: 512
+temperature: 0.9
+top_p: 0.95
+do_sample: true
+
+### Multimodal-specific settings
+image_aspect_ratio: "pad"      # How to handle image aspect ratios
+remove_unused_columns: false
+dataloader_pin_memory: true
+dataloader_num_workers: 4
+
+### Evaluation
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 100
+save_strategy: steps
+
+### Output
+output_dir: saves/qwen3-omni-gspo
+run_name: qwen3-omni-multimodal
+
+### Logging
+logging_steps: 5
+report_to: ["tensorboard", "wandb"]
+wandb_project: "qwen3-omni-gspo"
+
+### Notes
+# Qwen3-Omni supports vision, language, and audio inputs
+# GSPO helps stabilize training across different modalities
+# Requires special preprocessing for multimodal data
+# Each modality has its own projection layer
+# Supports interleaved image-text-audio sequences
