@@ -1,0 +1,67 @@
+# GSPO Training for Qwen3-4B (Nano) Model
+# Based on Alibaba's GSPO paper: https://arxiv.org/abs/2507.18071
+# Optimized for the 4B parameter model used in Zoo's Nano architecture
+
+### Model configuration
+model_name_or_path: Qwen/Qwen3-4B-Instruct  # The actual 4B nano model from the paper
+template: qwen3
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (tuned for 4B model)
+gspo_group_size: 16             # Larger groups for smaller model
+gspo_beta: 0.15                 # Slightly higher beta for 4B
+gspo_clip_epsilon: 0.25         # Wider clipping for stability
+gspo_sequence_level: true       # Sequence-level optimization (key to GSPO)
+gspo_normalize_rewards: true    
+gspo_moe_stabilization: false   # Not MoE model
+
+### Dataset configuration
+dataset: alpaca_gpt4_en         
+dataset_dir: data
+cutoff_len: 1024               # Moderate context for 4B model
+overwrite_cache: true
+
+### LoRA configuration (optimized for 4B)
+lora_rank: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target: all
+
+### Training hyperparameters
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 3.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 3600
+
+### Generation configuration
+max_new_tokens: 512
+temperature: 0.9
+top_p: 0.95
+do_sample: true
+
+### Evaluation
+per_device_eval_batch_size: 8
+eval_strategy: steps
+eval_steps: 100
+
+### Logging and saving
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+output_dir: saves/qwen3-4b-nano-gspo
+
+### Reporting
+report_to: tensorboard
+
+### Notes
+# This 4B model is the foundation for Zoo's Nano architecture
+# GSPO provides superior training stability vs GRPO for this size
+# As referenced in the GSPO paper (arxiv:2507.18071)

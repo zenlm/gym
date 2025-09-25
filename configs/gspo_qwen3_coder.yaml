@@ -1,0 +1,73 @@
+# GSPO Training for Qwen3-Coder Models
+# Specialized configuration for code generation tasks
+# Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
+
+### Model configuration
+model_name_or_path: Qwen/Qwen3-Coder-7B-Instruct  # Qwen3's code-specialized model
+template: qwen3-coder  # Special template for code tasks
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (optimized for code)
+gspo_group_size: 8
+gspo_beta: 0.1
+gspo_clip_epsilon: 0.2
+gspo_sequence_level: true       # Critical for code generation
+gspo_normalize_rewards: true
+gspo_moe_stabilization: false
+
+### Dataset configuration
+dataset: code_alpaca            # Code-specific dataset
+dataset_dir: data
+cutoff_len: 2048               # Longer context for code
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### LoRA configuration (code-optimized)
+lora_rank: 16                  # Higher rank for code understanding
+lora_alpha: 32
+lora_dropout: 0.1
+lora_target: all
+lora_modules_to_save: ["embed_tokens", "lm_head"]  # Save embeddings for code tokens
+
+### Training hyperparameters
+per_device_train_batch_size: 2  # Smaller batch due to longer sequences
+gradient_accumulation_steps: 8
+learning_rate: 2.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+gradient_checkpointing: true
+
+### Generation configuration (code-specific)
+max_new_tokens: 1024           # Longer for code generation
+temperature: 0.7                # Lower temperature for code
+top_p: 0.95
+do_sample: true
+repetition_penalty: 1.1        # Reduce code repetition
+
+### Code-specific training features
+remove_unused_columns: false   # Keep all code metadata
+load_best_model_at_end: true
+metric_for_best_model: "eval_loss"
+greater_is_better: false
+
+### Evaluation
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 50
+save_strategy: steps
+
+### Output
+output_dir: saves/qwen3-coder-gspo
+run_name: qwen3-coder-gspo
+
+### Notes
+# Qwen3-Coder uses a modified tokenizer optimized for code
+# GSPO's sequence-level optimization is particularly effective for code
+# The model excels at multiple programming languages
+# Trained with code-specific reward signals
