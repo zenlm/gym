@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --accent: 120 100% 50%;
+  }
+
+  * {
+    @apply border-zinc-800;
+  }
+
+  body {
+    @apply bg-black text-white;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-zinc-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-600;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent;
+  }
+
+  .glow {
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  }
+
+  .card {
+    @apply bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-lg p-6 hover:bg-zinc-900/70 transition-all duration-200;
+  }
+
+  .button-primary {
+    @apply bg-green-500 text-black font-semibold px-6 py-3 rounded-lg hover:bg-green-400 transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-400/30;
+  }
+
+  .button-secondary {
+    @apply bg-zinc-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-zinc-700 transition-all duration-200 border border-zinc-700;
+  }
+
+  .code-block {
+    @apply bg-zinc-950 border border-zinc-800 rounded-lg p-4 font-mono text-sm overflow-x-auto;
+  }
+
+  .matrix-rain {
+    background-image: linear-gradient(
+      0deg,
+      transparent 24%,
+      rgba(34, 197, 94, 0.05) 25%,
+      rgba(34, 197, 94, 0.05) 26%,
+      transparent 27%,
+      transparent 74%,
+      rgba(34, 197, 94, 0.05) 75%,
+      rgba(34, 197, 94, 0.05) 76%,
+      transparent 77%,
+      transparent
+    );
+    background-size: 30px 30px;
+    animation: matrix-rain 10s linear infinite;
+  }
+
+  @keyframes matrix-rain {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 0% 100%;
+    }
+  }
+
+  .terminal {
+    @apply bg-black border border-green-500/20 rounded-lg p-4 font-mono text-green-400 shadow-2xl shadow-green-500/10;
+  }
+
+  .terminal::before {
+    content: '$ ';
+    @apply text-green-500;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
