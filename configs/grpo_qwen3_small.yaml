@@ -1,0 +1,47 @@
+# GRPO Training for Qwen3-1.8B (Small Model)
+# Efficient training for edge deployment
+
+### Model configuration
+model_name_or_path: Qwen/Qwen3-1.8B-Instruct
+template: qwen
+
+### Training method
+stage: grpo
+finetuning_type: lora
+use_ref_model: true
+
+### GRPO specific parameters
+grpo_group_size: 16             # Larger groups for smaller model
+grpo_beta: 0.15                 # Slightly higher for small model
+grpo_clip_range: 0.25           
+grpo_normalize_advantages: true
+
+### Dataset configuration
+dataset: alpaca_gpt4_en
+dataset_dir: data
+cutoff_len: 512                 # Shorter context for efficiency
+overwrite_cache: true
+
+### LoRA configuration (smaller rank for small model)
+lora_rank: 4
+lora_alpha: 8
+lora_dropout: 0.05
+lora_target: all
+
+### Training hyperparameters
+per_device_train_batch_size: 8  # Larger batch for small model
+gradient_accumulation_steps: 2
+learning_rate: 1.0e-4
+num_train_epochs: 5
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+
+### Generation configuration
+max_new_tokens: 256
+temperature: 0.8
+top_p: 0.9
+do_sample: true
+
+### Output
+output_dir: saves/qwen3-1.8b-grpo
