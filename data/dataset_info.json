@@ -782,5 +782,15 @@
   "zen-nano-instruct-v1.0.1_training": {
     "file_name": "zen-nano-instruct-v1.0.1_training.json",
     "formatting": "alpaca"
+  },
+  "demo_dataset": {
+    "file_name": "data/demo/train.json",
+    "formatting": "alpaca",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "history": "history"
+    }
   }
 }
