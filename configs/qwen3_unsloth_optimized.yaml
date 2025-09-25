@@ -1,0 +1,94 @@
+# Qwen3 + Unsloth Optimizations Configuration
+# Maximum performance with memory efficiency
+# Zoo Labs Foundation - Gym Platform
+
+### Model selection (choose one)
+model_name_or_path: Qwen/Qwen3-4B  # Change to your Zen model
+
+### Unsloth Optimizations (2-3x speedup)
+use_unsloth: true               # Enable Unsloth
+use_unsloth_gc: true           # Unsloth gradient checkpointing
+enable_liger_kernel: true      # Liger kernel (requires Ampere+ GPU)
+
+### Dynamic Quantization (Unsloth-style)
+quantization_bit: 4            # 4-bit for maximum efficiency
+quantization_method: bnb        # BitsAndBytes
+load_in_4bit: true
+bnb_4bit_compute_dtype: bfloat16
+bnb_4bit_use_double_quant: true  # Double quantization like Unsloth
+bnb_4bit_quant_type: nf4         # NormalFloat4 quantization
+
+### Memory Optimizations
+gradient_checkpointing: true
+gradient_accumulation_steps: 8
+mixed_precision: bf16
+optim: paged_adamw_8bit        # Paged 8-bit optimizer
+
+### Flash Attention 2 (Qwen3 optimized)
+use_flash_attention: true
+flash_attention_version: 2
+
+### LoRA Configuration (Unsloth optimized)
+finetuning_type: lora
+lora_rank: 16                  # Moderate rank for balance
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target: all               # Target all linear layers
+use_rslora: true              # Rank-stabilized LoRA
+
+### Training Configuration
+stage: sft                     # Can be: sft, grpo, gspo
+per_device_train_batch_size: 2
+learning_rate: 2e-4           # Unsloth recommends higher LR
+num_train_epochs: 3
+warmup_ratio: 0.1
+lr_scheduler_type: cosine
+bf16: true
+
+### Advanced Optimizations
+upcast_layernorm: true        # Better stability
+upcast_lmhead_output: true    # Better generation quality
+use_reentrant_gc: false       # Faster gradient checkpointing
+
+### MoE-specific (for Coder/Omni/Next)
+moe_aux_loss_coef: 0.01       # Auxiliary loss for expert balancing
+
+### Dataset
+dataset: alpaca_gpt4_en
+cutoff_len: 2048
+preprocessing_num_workers: 4
+overwrite_cache: true
+
+### Evaluation
+eval_strategy: steps
+eval_steps: 100
+per_device_eval_batch_size: 4
+
+### Output
+output_dir: saves/qwen3-unsloth
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+
+### Generation
+max_new_tokens: 512
+temperature: 0.9
+top_p: 0.95
+do_sample: true
+
+### Notes:
+# This configuration combines:
+# 1. Unsloth optimizations for 2-3x speedup
+# 2. 4-bit quantization for 75% memory reduction
+# 3. Flash Attention 2 for faster attention computation
+# 4. Optimized for Qwen3 architecture
+#
+# Expected improvements:
+# - 2-3x faster training
+# - 75% less VRAM usage
+# - Minimal accuracy loss (~1-2%)
+#
+# Requirements:
+# - pip install unsloth
+# - pip install bitsandbytes
+# - CUDA 11.8+ with Ampere or newer GPU

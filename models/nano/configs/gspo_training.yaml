@@ -1,0 +1,67 @@
+# GSPO Training for Qwen3-0.6B (Zen Nano) Model
+# Based on Alibaba's GSPO paper: https://arxiv.org/abs/2507.18071
+# Optimized for Zoo's Zen Nano architecture (0.6B parameters)
+
+### Model configuration
+model_name_or_path: Qwen/Qwen3-0.6B  # Zen Nano model (smallest Qwen3 dense model)
+template: qwen3
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (tuned for 0.6B model)
+gspo_group_size: 32             # Larger groups for smaller model
+gspo_beta: 0.2                  # Higher beta for smaller model
+gspo_clip_epsilon: 0.3          # Wider clipping for stability
+gspo_sequence_level: true       # Sequence-level optimization (key to GSPO)
+gspo_normalize_rewards: true
+gspo_moe_stabilization: false   # Not MoE model
+
+### Dataset configuration
+dataset: alpaca_gpt4_en
+dataset_dir: data
+cutoff_len: 32768              # Qwen3-0.6B supports 32K context
+overwrite_cache: true
+
+### LoRA configuration (optimized for 0.6B)
+lora_rank: 4                   # Smaller rank for tiny model
+lora_alpha: 8
+lora_dropout: 0.05
+lora_target: all
+
+### Training hyperparameters
+per_device_train_batch_size: 8
+gradient_accumulation_steps: 2
+learning_rate: 5.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 3600
+
+### Generation configuration
+max_new_tokens: 256
+temperature: 0.9
+top_p: 0.95
+do_sample: true
+
+### Evaluation
+per_device_eval_batch_size: 16
+eval_strategy: steps
+eval_steps: 100
+
+### Logging and saving
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+output_dir: saves/qwen3-nano-0.6b-gspo
+
+### Reporting
+report_to: tensorboard
+
+### Notes
+# This 0.6B model is the Zen Nano architecture for Zoo
+# Ultra-efficient for edge deployment and rapid experimentation
+# GSPO provides superior training stability for tiny models

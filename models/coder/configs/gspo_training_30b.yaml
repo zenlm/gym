@@ -1,0 +1,70 @@
+# GSPO Training for Qwen3-Coder-30B-A3B (Zen Coder Standard)
+# Efficient code generation with 30B MoE architecture
+# Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
+
+### Model configuration
+model_name_or_path: Qwen/Qwen3-Coder-30B-A3B-Instruct  # Qwen3-Coder: 30B total, 3.3B active
+template: qwen3-coder
+model_type: coder-moe
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (optimized for 30B coder)
+gspo_group_size: 12
+gspo_beta: 0.12
+gspo_clip_epsilon: 0.22
+gspo_sequence_level: true       # Critical for code generation
+gspo_normalize_rewards: true
+gspo_moe_stabilization: true    # MoE stabilization for efficient routing
+
+### Dataset configuration
+dataset: code_alpaca            # Code-specific dataset
+dataset_dir: data
+cutoff_len: 32768              # Good context for most coding tasks
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### LoRA configuration (optimized for 30B MoE)
+lora_rank: 32
+lora_alpha: 64
+lora_dropout: 0.05
+lora_target: all
+
+### Training hyperparameters
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 2e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 3600
+
+### Generation configuration
+max_new_tokens: 2048
+temperature: 0.7               # Lower temp for code precision
+top_p: 0.9
+do_sample: true
+
+### Evaluation
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 100
+
+### Logging and saving
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+output_dir: saves/qwen3-coder-30b-gspo
+
+### Reporting
+report_to: tensorboard
+
+### Notes
+# This is the standard Zen Coder model (30B MoE)
+# Offers excellent balance of performance and efficiency
+# Only 3.3B parameters active per token
+# Great for production code generation workloads
