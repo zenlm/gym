@@ -3,7 +3,7 @@
 # Optimized for MoE models like Qwen3-MoE
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen2.5-32B-Instruct  # Replace with MoE variant if available
+model_name_or_path: Qwen/Qwen3-72B-MoE-Instruct  # Qwen3 MoE model
 template: qwen
 
 ### Training method
