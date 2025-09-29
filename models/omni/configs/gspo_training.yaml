@@ -3,7 +3,7 @@
 # Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen3-Omni-30B-A3B-Instruct  # Qwen3-Omni: 30B total, 3B active
+model_name_or_path: zenlm/zen-omni-30b-a3b-instruct  # Zen Omni: 30B total, 3B active
 template: qwen3-omni
 model_type: multimodal
 
@@ -30,7 +30,7 @@ audio_sampling_rate: 16000      # Audio sampling rate
 ### Dataset configuration
 dataset: multimodal_instruct    # Multimodal dataset
 dataset_dir: data
-cutoff_len: 1536               # Balance between modalities
+cutoff_len: 262144             # 256K context, scalable to 1M
 overwrite_cache: true
 preprocessing_num_workers: 4
 
@@ -71,7 +71,7 @@ eval_steps: 100
 save_strategy: steps
 
 ### Output
-output_dir: saves/qwen3-omni-gspo
+output_dir: saves/zen-omni-30b-gspo
 run_name: qwen3-omni-multimodal
 
 ### Logging

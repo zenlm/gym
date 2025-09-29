@@ -3,7 +3,7 @@
 # Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen3-Coder-480B-A35B-Instruct  # Qwen3-Coder: 480B MoE with 35B active
+model_name_or_path: zenlm/zen-coder-480b-a35b-instruct  # Zen Coder Max: 480B total, 35B active
 template: qwen3-coder  # Special template for code tasks
 
 ### Training method
@@ -22,7 +22,7 @@ gspo_moe_stabilization: true    # MoE with 128 experts, 8 active per token
 ### Dataset configuration
 dataset: code_alpaca            # Code-specific dataset
 dataset_dir: data
-cutoff_len: 262144             # Qwen3-Coder supports 256K native, 1M with YaRN
+cutoff_len: 262144             # 256K context, scalable to 1M
 overwrite_cache: true
 preprocessing_num_workers: 8
 
@@ -63,7 +63,7 @@ eval_steps: 50
 save_strategy: steps
 
 ### Output
-output_dir: saves/qwen3-coder-gspo
+output_dir: saves/zen-coder-480b-gspo
 run_name: qwen3-coder-gspo
 
 ### Notes

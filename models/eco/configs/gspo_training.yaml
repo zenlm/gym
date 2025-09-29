@@ -3,7 +3,7 @@
 # Optimized for Zoo's Zen Eco architecture (4B parameters)
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen3-4B  # Zen Eco model (4B dense, matches Qwen2.5-7B performance)
+model_name_or_path: zenlm/zen-eco-4b  # Zen Eco: 4B dense model
 template: qwen3
 
 ### Training method
@@ -22,7 +22,7 @@ gspo_moe_stabilization: false   # Not MoE model
 ### Dataset configuration
 dataset: alpaca_gpt4_en
 dataset_dir: data
-cutoff_len: 32768              # Qwen3-4B supports 32K context
+cutoff_len: 262144             # 256K context, scalable to 1M
 overwrite_cache: true
 
 ### LoRA configuration (optimized for 4B)
@@ -56,7 +56,7 @@ eval_steps: 100
 logging_steps: 10
 save_steps: 500
 save_total_limit: 3
-output_dir: saves/qwen3-eco-4b-gspo
+output_dir: saves/zen-eco-4b-gspo
 
 ### Reporting
 report_to: tensorboard

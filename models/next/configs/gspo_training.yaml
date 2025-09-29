@@ -3,7 +3,7 @@
 # Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen3-Next-80B-A3B-Instruct  # REAL Qwen3-Next: 80B total, 3B active
+model_name_or_path: zenlm/zen-next-80b-a3b-instruct  # Zen Next: 80B total, 3B active
 template: qwen3-next
 model_type: next-gen
 
@@ -32,7 +32,7 @@ use_flash_attention: true              # FlashAttention-3
 ### Dataset configuration
 dataset: alpaca_gpt4_en
 dataset_dir: data
-cutoff_len: 4096               # Extended context support
+cutoff_len: 262144             # 256K context, scalable to 1M
 overwrite_cache: true
 preprocessing_num_workers: 8
 
@@ -82,7 +82,7 @@ load_best_model_at_end: true
 metric_for_best_model: "eval_loss"
 
 ### Output
-output_dir: saves/qwen3-next-gspo
+output_dir: saves/zen-next-80b-gspo
 run_name: qwen3-next-experimental
 
 ### Monitoring

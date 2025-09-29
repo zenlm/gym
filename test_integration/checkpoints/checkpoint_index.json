@@ -1,0 +1,69 @@
+{
+  "checkpoints": [
+    {
+      "checkpoint_id": "checkpoint_e0001_s00000102",
+      "epoch": 1,
+      "step": 102,
+      "loss": 0.7000000000000001,
+      "timestamp": "2025-09-25T17:31:11.779350",
+      "is_best": true,
+      "metrics": {
+        "loss": 0.7000000000000001,
+        "accuracy": 0.7999999999999999
+      },
+      "metadata": null
+    },
+    {
+      "checkpoint_id": "checkpoint_e0000_s00000002",
+      "epoch": 0,
+      "step": 2,
+      "loss": 0.8,
+      "timestamp": "2025-09-25T17:30:51.176450",
+      "is_best": true,
+      "metrics": {
+        "loss": 0.8,
+        "accuracy": 0.7
+      },
+      "metadata": null
+    },
+    {
+      "checkpoint_id": "checkpoint_e0000_s00000002",
+      "epoch": 0,
+      "step": 2,
+      "loss": 0.8,
+      "timestamp": "2025-09-25T17:31:11.777785",
+      "is_best": true,
+      "metrics": {
+        "loss": 0.8,
+        "accuracy": 0.7
+      },
+      "metadata": null
+    }
+  ],
+  "best_checkpoint": {
+    "checkpoint_id": "checkpoint_e0001_s00000102",
+    "epoch": 1,
+    "step": 102,
+    "loss": 0.7000000000000001,
+    "timestamp": "2025-09-25T17:31:11.779350",
+    "is_best": true,
+    "metrics": {
+      "loss": 0.7000000000000001,
+      "accuracy": 0.7999999999999999
+    },
+    "metadata": null
+  },
+  "latest_checkpoint": {
+    "checkpoint_id": "checkpoint_e0001_s00000102",
+    "epoch": 1,
+    "step": 102,
+    "loss": 0.7000000000000001,
+    "timestamp": "2025-09-25T17:31:11.779350",
+    "is_best": true,
+    "metrics": {
+      "loss": 0.7000000000000001,
+      "accuracy": 0.7999999999999999
+    },
+    "metadata": null
+  }
+}

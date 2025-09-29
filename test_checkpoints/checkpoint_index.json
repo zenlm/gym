@@ -1,0 +1,52 @@
+{
+  "checkpoints": [
+    {
+      "checkpoint_id": "checkpoint_e0002_s00000200",
+      "epoch": 2,
+      "step": 200,
+      "loss": 0.6,
+      "timestamp": "2025-09-25T17:30:51.168774",
+      "is_best": true,
+      "metrics": {
+        "accuracy": 0.9
+      },
+      "metadata": null
+    },
+    {
+      "checkpoint_id": "checkpoint_e0002_s00000200",
+      "epoch": 2,
+      "step": 200,
+      "loss": 0.6,
+      "timestamp": "2025-09-25T17:31:11.772578",
+      "is_best": true,
+      "metrics": {
+        "accuracy": 0.9
+      },
+      "metadata": null
+    }
+  ],
+  "best_checkpoint": {
+    "checkpoint_id": "checkpoint_e0002_s00000200",
+    "epoch": 2,
+    "step": 200,
+    "loss": 0.6,
+    "timestamp": "2025-09-25T17:31:11.772578",
+    "is_best": true,
+    "metrics": {
+      "accuracy": 0.9
+    },
+    "metadata": null
+  },
+  "latest_checkpoint": {
+    "checkpoint_id": "checkpoint_e0002_s00000200",
+    "epoch": 2,
+    "step": 200,
+    "loss": 0.6,
+    "timestamp": "2025-09-25T17:31:11.772578",
+    "is_best": true,
+    "metrics": {
+      "accuracy": 0.9
+    },
+    "metadata": null
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "trials": [
+    {
+      "trial_id": "trial_0000",
+      "parameters": {
+        "learning_rate": 0.0010943843509614386,
+        "batch_size": 128,
+        "hidden_size": 466,
+        "dropout": 0.36131258011155587
+      },
+      "metric": 1.0,
+      "status": "completed",
+      "start_time": "2025-09-25T17:30:51.159661",
+      "end_time": "2025-09-25T17:30:51.159871",
+      "metadata": {
+        "strategy": "random",
+        "epochs_trained": 10
+      }
+    },
+    {
+      "trial_id": "trial_0001",
+      "parameters": {
+        "learning_rate": 0.0006989518743498965,
+        "batch_size": 64,
+        "hidden_size": 187,
+        "dropout": 0.37119808643262997
+      },
+      "metric": 0.85,
+      "status": "completed",
+      "start_time": "2025-09-25T17:30:51.160260",
+      "end_time": "2025-09-25T17:30:51.160424",
+      "metadata": {
+        "strategy": "random",
+        "epochs_trained": 10
+      }
+    },
+    {
+      "trial_id": "trial_0002",
+      "parameters": {
+        "learning_rate": 0.00012497750260102159,
+        "batch_size": 64,
+        "hidden_size": 264,
+        "dropout": 0.23212880685235981
+      },
+      "metric": 0.7,
+      "status": "completed",
+      "start_time": "2025-09-25T17:30:51.160783",
+      "end_time": "2025-09-25T17:30:51.160948",
+      "metadata": {
+        "strategy": "random",
+        "epochs_trained": 10
+      }
+    },
+    {
+      "trial_id": "trial_0003",
+      "parameters": {
+        "learning_rate": 0.0027448044786228627,
+        "batch_size": 32,
+        "hidden_size": 414,
+        "dropout": 0.13079754407122296
+      },
+      "metric": 0.55,
+      "status": "completed",
+      "start_time": "2025-09-25T17:30:51.161341",
+      "end_time": "2025-09-25T17:30:51.161507",
+      "metadata": {
+        "strategy": "random",
+        "epochs_trained": 10
+      }
+    },
+    {
+      "trial_id": "trial_0004",
+      "parameters": {
+        "learning_rate": 0.0006433184603333859,
+        "batch_size": 128,
+        "hidden_size": 225,
+        "dropout": 0.291099567946111
+      },
+      "metric": 0.4,
+      "status": "completed",
+      "start_time": "2025-09-25T17:30:51.161891",
+      "end_time": "2025-09-25T17:30:51.162070",
+      "metadata": {
+        "strategy": "random",
+        "epochs_trained": 10
+      }
+    }
+  ],
+  "best_trial_id": "trial_0004",
+  "metric_name": "validation_loss",
+  "mode": "min"
+}

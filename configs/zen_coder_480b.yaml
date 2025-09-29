@@ -1,0 +1,81 @@
+# GSPO Training for Qwen3-Coder-480B-A35B (Zen Coder Max)
+# Maximum-scale code generation with 480B MoE architecture
+# Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
+
+### Model configuration
+model_name_or_path: zenlm/zen-coder-480b-a35b-instruct  # Zen Coder Max: 480B total, 35B active
+template: qwen3-coder
+model_type: coder-moe-max
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (optimized for 480B scale)
+gspo_group_size: 8
+gspo_beta: 0.1
+gspo_clip_epsilon: 0.2
+gspo_sequence_level: true       # Critical for code generation
+gspo_normalize_rewards: true
+gspo_moe_stabilization: true    # MoE with 128 experts, 8 active per token
+
+### Dataset configuration
+dataset: code_alpaca            # Code-specific dataset
+dataset_dir: data
+cutoff_len: 262144             # 256K context window
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### LoRA configuration (code-optimized)
+lora_rank: 16                  # Moderate rank for massive model
+lora_alpha: 32
+lora_dropout: 0.1
+lora_target: all
+lora_modules_to_save: ["embed_tokens", "lm_head"]  # Save embeddings for code tokens
+
+### Training hyperparameters
+per_device_train_batch_size: 1  # Very small batch due to model size
+gradient_accumulation_steps: 16
+learning_rate: 2.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+gradient_checkpointing: true
+fsdp: "full_shard auto_wrap"   # FSDP for distributed training
+
+### Generation configuration (code-specific)
+max_new_tokens: 4096           # Extended for complex code generation
+temperature: 0.7               # Lower temperature for code precision
+top_p: 0.95
+do_sample: true
+repetition_penalty: 1.1        # Reduce code repetition
+
+### Code-specific training features
+remove_unused_columns: false   # Keep all code metadata
+load_best_model_at_end: true
+metric_for_best_model: "eval_loss"
+greater_is_better: false
+
+### Evaluation
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 50
+save_strategy: steps
+
+### Output
+output_dir: saves/zen-coder-480b-gspo
+run_name: zen-coder-480b-max
+
+### Logging
+logging_steps: 10
+report_to: ["tensorboard", "wandb"]
+wandb_project: "zen-coder-480b"
+
+### Notes
+# This is the maximum-scale Zen Coder model (480B MoE)
+# State-of-the-art code generation capabilities
+# Only 35B parameters active per token despite 480B total
+# Requires significant compute resources for training
+# Optimized for the most complex coding tasks

@@ -1,24 +1,50 @@
-cutoff_len: 2048
-dataset: zen_nano
-dataset_dir: /Users/z/work/zoo/gym/data
-do_train: true
+# QLoRA Training for Zen Nano (0.6B) Model
+# Quantized LoRA fine-tuning configuration
+# Optimized for memory-efficient training on smaller GPUs
+
+### Model configuration
+model_name_or_path: zenlm/zen-nano-0.6b  # Zen Nano: 0.6B dense model
+template: qwen3
+
+### Training method
+stage: sft
 finetuning_type: lora
-gradient_accumulation_steps: 8
-gradient_checkpointing: true
-learning_rate: 0.0001
-logging_steps: 10
+quantization_bit: 4            # 4-bit quantization for QLoRA
+
+### Dataset configuration
+dataset: alpaca_gpt4_en
+dataset_dir: data
+cutoff_len: 40960              # 40K context window
+overwrite_cache: true
+
+### LoRA configuration (QLoRA optimized)
+lora_rank: 16                  # Higher rank to compensate for quantization
 lora_alpha: 32
 lora_dropout: 0.05
-lora_rank: 16
 lora_target: all
-lr_scheduler_type: cosine
-model_name_or_path: Qwen/Qwen3-4B-Instruct
-num_train_epochs: 3
-output_dir: ./output/zen-nano
+
+### Training hyperparameters
 per_device_train_batch_size: 2
-plot_loss: true
-quantization_bit: 4
-save_steps: 100
-stage: sft
-template: qwen3
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-4
+num_train_epochs: 3
+lr_scheduler_type: cosine
 warmup_ratio: 0.1
+gradient_checkpointing: true   # Memory optimization
+
+### Logging and saving
+logging_steps: 10
+save_steps: 100
+save_total_limit: 3
+plot_loss: true
+output_dir: saves/zen-nano-qlora
+
+### Reporting
+report_to: tensorboard
+do_train: true
+
+### Notes
+# QLoRA enables fine-tuning on consumer GPUs
+# 4-bit quantization reduces memory by ~75%
+# Gradient checkpointing further reduces memory usage
+# Ideal for experimentation on limited hardware

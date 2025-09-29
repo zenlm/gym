@@ -1,0 +1,14 @@
+{"step": 1, "timestamp": 1758839451.148739, "metrics": {"train/loss": 1.0, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 1}}
+{"step": 2, "timestamp": 1758839451.148792, "metrics": {"train/loss": 0.9, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 2}}
+{"step": 3, "timestamp": 1758839451.148841, "metrics": {"train/loss": 0.8, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 3}}
+{"step": 4, "timestamp": 1758839451.148863, "metrics": {"train/loss": 0.7, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 4}}
+{"step": 5, "timestamp": 1758839451.148896, "metrics": {"train/loss": 0.6, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 5}}
+{"step": 0, "timestamp": 1758839451.148915, "metrics": {"val/loss": 0.5, "val/accuracy": 0.85}}
+{"step": 0, "timestamp": 1758839451.149158, "metrics": {"resources/cpu_percent": 0.0, "resources/memory_mb": 466.359375, "resources/memory_percent": 0.7116079330444336, "resources/uptime_seconds": 0.00045990943908691406, "resources/network_sent_mb": 1717.5595703125, "resources/network_recv_mb": 2221.46484375}}
+{"step": 1, "timestamp": 1758839471.762389, "metrics": {"train/loss": 1.0, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 1}}
+{"step": 2, "timestamp": 1758839471.7624269, "metrics": {"train/loss": 0.9, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 2}}
+{"step": 3, "timestamp": 1758839471.762469, "metrics": {"train/loss": 0.8, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 3}}
+{"step": 4, "timestamp": 1758839471.762481, "metrics": {"train/loss": 0.7, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 4}}
+{"step": 5, "timestamp": 1758839471.76251, "metrics": {"train/loss": 0.6, "train/learning_rate": 0.001, "train/batch_size": 32, "train/epoch": 0, "train/batch": 5}}
+{"step": 0, "timestamp": 1758839471.762523, "metrics": {"val/loss": 0.5, "val/accuracy": 0.85}}
+{"step": 0, "timestamp": 1758839471.76273, "metrics": {"resources/cpu_percent": 0.0, "resources/memory_mb": 467.96875, "resources/memory_percent": 0.7140636444091797, "resources/uptime_seconds": 0.00035309791564941406, "resources/network_sent_mb": 1719.5927734375, "resources/network_recv_mb": 2224.2978515625}}
