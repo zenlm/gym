@@ -3,7 +3,7 @@
 # Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
 
 ### Model configuration
-model_name_or_path: Qwen/Qwen3-Coder-30B-A3B-Instruct  # REAL Qwen3-Coder: 30B total, 3B active
+model_name_or_path: zenlm/zen-coder-30b-a3b-instruct  # Zen Coder: 30B total, 3B active
 template: qwen3-coder
 model_type: coder-moe
 
@@ -23,7 +23,7 @@ gspo_moe_stabilization: true    # MoE stabilization for efficient routing
 ### Dataset configuration
 dataset: code_alpaca            # Code-specific dataset
 dataset_dir: data
-cutoff_len: 32768              # Good context for most coding tasks
+cutoff_len: 262144             # 256K context, scalable to 1M
 overwrite_cache: true
 preprocessing_num_workers: 8
 
@@ -58,7 +58,7 @@ eval_steps: 100
 logging_steps: 10
 save_steps: 500
 save_total_limit: 3
-output_dir: saves/qwen3-coder-30b-gspo
+output_dir: saves/zen-coder-30b-gspo
 
 ### Reporting
 report_to: tensorboard

@@ -48,6 +48,9 @@ class BitDeltaQuantizer:
         self.base_weights: Dict[str, torch.Tensor] = {}
         self.delta_signs: Dict[str, torch.Tensor] = {}
         self.delta_scales: Dict[str, torch.Tensor] = {}
+        self.compression_stats: Dict[str, float] = {}
+        self.serving_cache: Dict[str, torch.Tensor] = {}
+        self._optimization_enabled = torch.cuda.is_available()
         
     def quantize_delta(
         self,
@@ -350,3 +353,43 @@ class BitDeltaLinear(nn.Module):
             bitdelta_linear.bias.data = linear.bias.data - base_linear.bias.data
         
         return bitdelta_linear
+    
+    def optimize_for_serving(self):
+        """Optimize quantized model for fast serving."""
+        print("Optimizing BitDelta for serving...")
+        
+        # Pack signs into bytes for better memory efficiency
+        for name, signs in list(self.delta_signs.items()):
+            if '_packed' not in name and signs.dtype == torch.int8:
+                # Pack 8 signs into 1 byte
+                signs_flat = signs.flatten()
+                num_signs = signs_flat.numel()
+                num_bytes = (num_signs + 7) // 8
+                
+                packed = torch.zeros(num_bytes, dtype=torch.uint8)
+                for i in range(num_signs):
+                    if signs_flat[i] > 0:
+                        byte_idx = i // 8
+                        bit_idx = i % 8
+                        packed[byte_idx] |= (1 << bit_idx)
+                
+                # Store packed version
+                self.delta_signs[name + '_packed'] = packed
+                self.delta_signs[name + '_shape'] = torch.tensor(signs.shape)
+        
+        # Precompute commonly used deltas
+        if self.base_weights:
+            for name in list(self.delta_signs.keys())[:10]:  # Top 10 layers
+                if name in self.delta_scales and not name.endswith('_packed'):
+                    # Precompute and cache
+                    signs = self.delta_signs[name]
+                    scales = self.delta_scales[name]
+                    shape = self.base_weights[name].shape if name in self.base_weights else signs.shape
+                    _ = self.dequantize_delta(signs, scales, shape, use_cache=True)
+        
+        print(f"Optimization complete. Cache size: {len(self.serving_cache)} entries")
+    
+    def clear_cache(self):
+        """Clear serving cache to free memory."""
+        self.serving_cache.clear()
+        torch.cuda.empty_cache() if torch.cuda.is_available() else None

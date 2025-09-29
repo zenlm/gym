@@ -135,7 +135,8 @@ class DeltaQuantizer:
             # Ternary quantization (-1, 0, +1)
             threshold = delta.abs().mean() * 0.7
             quantized = torch.sign(delta) * (delta.abs() > threshold)
-            scale = delta.abs()[delta.abs() > threshold].mean()
+            above_threshold = delta.abs()[delta.abs() > threshold]
+            scale = above_threshold.mean() if above_threshold.numel() > 0 else delta.abs().mean()
             params = {'scale': scale, 'threshold': threshold, 'bits': 2}
             
         else:

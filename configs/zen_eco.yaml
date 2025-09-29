@@ -1,1 +1,68 @@
-../models/eco/configs/gspo_training.yaml
+# GSPO Training for Qwen3-4B (Zen Eco) Model
+# Based on Alibaba's GSPO paper: https://arxiv.org/abs/2507.18071
+# Optimized for Zoo's Zen Eco architecture (4B parameters)
+
+### Model configuration
+model_name_or_path: zenlm/zen-eco-4b  # Zen Eco: 4B dense model
+template: qwen3
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (tuned for 4B model)
+gspo_group_size: 16             # Balanced groups for medium model
+gspo_beta: 0.15                 # Standard beta for 4B
+gspo_clip_epsilon: 0.25         # Moderate clipping
+gspo_sequence_level: true       # Sequence-level optimization (key to GSPO)
+gspo_normalize_rewards: true
+gspo_moe_stabilization: false   # Not MoE model
+
+### Dataset configuration
+dataset: alpaca_gpt4_en
+dataset_dir: data
+cutoff_len: 262144             # 256K context, scalable to 1M
+overwrite_cache: true
+
+### LoRA configuration (optimized for 4B)
+lora_rank: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target: all
+
+### Training hyperparameters
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 3.0e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 3600
+
+### Generation configuration
+max_new_tokens: 512
+temperature: 0.9
+top_p: 0.95
+do_sample: true
+
+### Evaluation
+per_device_eval_batch_size: 8
+eval_strategy: steps
+eval_steps: 100
+
+### Logging and saving
+logging_steps: 10
+save_steps: 500
+save_total_limit: 3
+output_dir: saves/zen-eco-4b-gspo
+
+### Reporting
+report_to: tensorboard
+
+### Notes
+# This 4B model is the Zen Eco architecture for Zoo
+# Balanced efficiency and capability for production deployments
+# GSPO provides superior training stability vs GRPO for this size
+# As referenced in the GSPO paper (arxiv:2507.18071)

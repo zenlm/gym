@@ -1,1 +1,99 @@
-../models/next/configs/gspo_training.yaml
+# GSPO Training for Qwen3-Next (Future Architecture)
+# Next-generation Qwen3 with architectural improvements
+# Based on Alibaba's GSPO: https://arxiv.org/abs/2507.18071
+
+### Model configuration
+model_name_or_path: zenlm/zen-next-80b-a3b-instruct  # Zen Next: 80B total, 3B active
+template: qwen3-next
+model_type: next-gen
+
+### Training method
+stage: gspo
+finetuning_type: lora
+use_ref_model: true
+
+### GSPO specific parameters (next-gen optimized)
+gspo_group_size: 8
+gspo_beta: 0.12
+gspo_clip_epsilon: 0.2
+gspo_sequence_level: true
+gspo_normalize_rewards: true
+gspo_moe_stabilization: true    # Qwen3-Next hybrid architecture with 80B/3B active
+
+### Next-gen architecture features
+use_sliding_window_attention: true     # Sliding window for efficiency
+window_size: 4096
+use_grouped_query_attention: true      # GQA for efficiency
+num_key_value_heads: 8
+use_rope_scaling: true                 # Extended context via RoPE
+rope_scaling_factor: 2.0
+use_flash_attention: true              # FlashAttention-3
+
+### Dataset configuration
+dataset: alpaca_gpt4_en
+dataset_dir: data
+cutoff_len: 262144             # 256K context, scalable to 1M
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### LoRA configuration (next-gen)
+lora_rank: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target: all
+use_rslora: true               # Rank-stabilized LoRA
+use_dora: false                # Weight-decomposed LoRA
+
+### Training hyperparameters
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 2.5e-5
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+tf32: true                     # TF32 for A100/H100
+gradient_checkpointing: true
+fsdp: "full_shard auto_wrap"   # FSDP for distributed training
+
+### Advanced optimization
+use_lion_optimizer: false       # Option for Lion optimizer
+use_sophia_optimizer: false     # Option for Sophia optimizer
+use_lomo_optimizer: false       # Option for LOMO optimizer
+weight_decay: 0.01
+adam_beta1: 0.9
+adam_beta2: 0.95              # Lower beta2 for stability
+
+### Generation configuration
+max_new_tokens: 1024
+temperature: 0.9
+top_p: 0.95
+top_k: 50
+do_sample: true
+num_beams: 1                   # Greedy by default
+repetition_penalty: 1.05
+
+### Evaluation
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 100
+save_strategy: steps
+load_best_model_at_end: true
+metric_for_best_model: "eval_loss"
+
+### Output
+output_dir: saves/zen-next-80b-gspo
+run_name: qwen3-next-experimental
+
+### Monitoring
+logging_steps: 10
+report_to: ["tensorboard", "wandb"]
+wandb_project: "qwen3-next"
+log_level: "info"
+
+### Notes
+# Qwen3-Next incorporates latest architectural improvements
+# Uses sliding window attention for better long-context handling
+# GQA reduces memory usage while maintaining quality
+# GSPO stabilizes training of these advanced features
+# Experimental architecture - may change in future releases

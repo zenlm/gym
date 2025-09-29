@@ -1,0 +1,11 @@
+{
+  "epoch": 0,
+  "step": 2,
+  "loss": 0.8,
+  "metrics": {
+    "loss": 0.8,
+    "accuracy": 0.7
+  },
+  "metadata": {},
+  "timestamp": "2025-09-25T17:31:11.777785"
+}

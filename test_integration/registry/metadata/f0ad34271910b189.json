@@ -1,0 +1,25 @@
+{
+  "model_id": "f0ad34271910b189",
+  "name": "integrated_model",
+  "version": "1.0.0",
+  "created_at": "2025-09-25T17:31:11.780663",
+  "updated_at": "2025-09-25T17:31:11.781056",
+  "status": "production",
+  "architecture": "feedforward",
+  "framework_version": "2.8.0",
+  "parameters": {
+    "total": 101770,
+    "trainable": 101770,
+    "non_trainable": 0
+  },
+  "metrics": {
+    "loss": 0.7000000000000001,
+    "accuracy": 0.7999999999999999
+  },
+  "tags": [],
+  "checksum": "3a6bb3cda336a70791f9f2ba0e625812f50d2e3614144ee58bf2ab9c20d28194",
+  "size_mb": 0.3885040283203125,
+  "parent_model_id": null,
+  "description": "Model from integrated test",
+  "author": null
+}
