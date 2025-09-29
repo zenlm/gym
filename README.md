@@ -3,6 +3,8 @@
 **Zen Gym** is the unified training infrastructure for all Zen AI models. Built on LLaMA Factory, it provides comprehensive support for fine-tuning, reinforcement learning, and deployment across the entire Zen model family.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![GitHub](https://img.shields.io/badge/GitHub-zenlm%2Fzen--gym-blue)](https://github.com/zenlm/zen-gym)
+[![HuggingFace](https://img.shields.io/badge/🤗-Models-yellow)](https://huggingface.co/zenlm)
 
 ## Overview
 
@@ -476,6 +478,17 @@ If you use Zen Gym in your research, please cite:
 }
 ```
 
+## Links
+
+- **GitHub**: https://github.com/zenlm/zen-gym
+- **Organization**: https://github.com/zenlm
+- **HuggingFace Models**: https://huggingface.co/zenlm
+- **Zen Engine** (Inference): https://github.com/zenlm/zen-engine
+- **Zen Musician**: https://github.com/zenlm/zen-musician
+- **Zen 3D**: https://github.com/zenlm/zen-3d
+
 ---
 
 **Zen Gym** - Unified training platform for all Zen AI models
+
+Part of the **[Zen AI](https://github.com/zenlm)** ecosystem.
