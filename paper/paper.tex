@@ -10,7 +10,7 @@
 \usepackage{algpseudocode}
 \usepackage{cite}
 
-\title{Zen Gym: Unified Training Platform for Modern AI Models}
+\title{Zen Gym: Unified AI Training Platform}
 
 \author{
     Zen Research Authors \\
@@ -28,149 +28,56 @@
 \maketitle
 
 \begin{abstract}
-We present Zen Gym, a comprehensive training platform that unifies all modern fine-tuning and reinforcement learning methods. Zen Gym supports LoRA, QLoRA, GRPO, GSPO, DPO, PPO, and 10+ other training techniques in a single, easy-to-use framework. With optimizations like Unsloth (2-5x speedup) and FlashAttention-2, Zen Gym enables efficient training of models from 0.6B to 200B+ parameters on consumer hardware.
+Comprehensive training platform supporting LoRA, QLoRA, GRPO, GSPO, DPO, PPO and 10+ modern methods.
 \end{abstract}
 
 \section{Introduction}
+Comprehensive training platform supporting LoRA, QLoRA, GRPO, GSPO, DPO, PPO and 10+ modern methods.
 
-Training modern AI models requires navigating a complex landscape of techniques: parameter-efficient fine-tuning (PEFT), reinforcement learning from human feedback (RLHF), and various optimization strategies. Researchers and practitioners face the challenge of implementing, tuning, and comparing these methods across different models and tasks. Zen Gym addresses this by providing a unified platform that integrates all modern training techniques with state-of-the-art optimizations.
-
-\subsection{Motivation}
-The fragmentation of AI training tools creates significant barriers to research and development. Each training method often requires its own codebase, dependencies, and expertise. This fragmentation wastes time, increases bugs, and makes it difficult to compare approaches fairly. Zen Gym unifies these tools, providing a consistent interface while maintaining the flexibility to experiment with cutting-edge techniques.
-
-\subsection{Contributions}
-Our key contributions are:
+\subsection{Key Features}
 \begin{itemize}
-    \item Unified interface for 15+ training methods (LoRA, GRPO, DPO, PPO, etc.)
-    \item Integration of state-of-the-art optimizations (Unsloth, FlashAttention-2, Liger Kernel)
-    \item Support for models from 0.6B to 200B+ parameters
+    \item Unified interface for 15+ training methods
+    \item 2-5x speedup with Unsloth integration
+    \item 40-60\% memory reduction with GRPO
+    \item Support for 0.6B to 200B+ parameter models
 \end{itemize}
 
-\section{Related Work}
-
-See individual model citations in bibliography.
-
-\section{Architecture}
-
-Zen Gym is built on LLaMA Factory with extensive enhancements. The architecture consists of: (1) Model Loading Layer supporting HuggingFace Transformers, (2) Training Method Layer with modular implementations of PEFT and RLHF techniques, (3) Optimization Layer with FlashAttention-2 and quantization, (4) Distributed Training Layer with FSDP and DeepSpeed integration.
-
-\subsection{Model Design}
-Detailed in Architecture section above.
-
-\subsection{Technical Specifications}
+\section{Technical Specifications}
 \begin{table}[h]
 \centering
 \begin{tabular}{@{}ll@{}}
 \toprule
 \textbf{Parameter} & \textbf{Value} \\
 \midrule
-Supported Models & 0.6B - 200B+ parameters \\\\\nTraining Methods & 15+ (LoRA, GRPO, DPO, etc.) \\\\\nOptimizations & Unsloth, FlashAttention-2, Liger \\\\\nDistributed & FSDP, DeepSpeed, Multi-node \\\\\nHardware & Single GPU to multi-node clusters \\\\
+Supported Models & 0.6B - 200B+ parameters \\
+Training Methods & 15+ (LoRA, GRPO, DPO, etc.) \\
+Optimizations & Unsloth, FlashAttention-2, Liger \\
+Distributed & FSDP, DeepSpeed, Multi-node \\
+Hardware & Single GPU to multi-node clusters
 \bottomrule
 \end{tabular}
-\caption{Technical specifications of gym}
+\caption{Technical specifications}
 \label{tab:specs}
 \end{table}
 
-\section{Training Methodology}
-
-All training performed with Zen Gym platform.
-
-\subsection{Training Infrastructure}
-All models are trained using \textbf{Zen Gym}~\cite{zengym2025}, our unified training platform supporting:
-\begin{itemize}
-    \item LoRA, QLoRA, DoRA for efficient fine-tuning
-    \item GRPO, GSPO for memory-efficient reinforcement learning
-    \item DPO, PPO, KTO, ORPO, SimPO for alignment
-    \item Unsloth for 2-5x training speedup
-    \item FlashAttention-2 and Liger Kernel optimizations
-\end{itemize}
-
-\section{Experimental Results}
-
-Zen Gym achieves 2-5x training speedup compared to baseline implementations through Unsloth integration. Memory usage is reduced by 40-60\% with GRPO compared to standard PPO. Training quality matches or exceeds specialized implementations across all supported methods.
-
-\subsection{Performance Benchmarks}
-\begin{table}[h]
-\centering
-\begin{tabular}{@{}lcc@{}}
-\toprule
-\textbf{Benchmark} & \textbf{gym} & \textbf{Baseline} \\
-\midrule
-See Results section for detailed benchmarks.
-\bottomrule
-\end{tabular}
-\caption{Performance comparison on standard benchmarks}
-\label{tab:benchmarks}
-\end{table}
-
-\section{Inference and Deployment}
-
-Models are deployed using \textbf{Zen Engine}~\cite{zenengine2025}, our high-performance inference engine achieving:
-\begin{itemize}
-    \item 44K tokens/sec on M3 Max (MLX backend)
-    \item 28K tokens/sec on RTX 4090 (CUDA backend)
-    \item OpenAI-compatible API
-    \item Support for PyTorch, MLX, and GGUF formats
-\end{itemize}
-
-\section{Applications and Use Cases}
-
-Wide range of applications across research and production.
-
-\section{Ethical Considerations}
-
-As a 501(c)(3) non-profit organization, Zen Research is committed to:
-\begin{itemize}
-    \item \textbf{Open Access}: All models released under Apache 2.0
-    \item \textbf{Environmental Responsibility}: Eco-friendly training and deployment
-    \item \textbf{Privacy}: Local-first inference, no data collection
-    \item \textbf{Transparency}: Full disclosure of training data and methods
-    \item \textbf{Safety}: Comprehensive evaluation and red-teaming
-\end{itemize}
-
 \section{Zen AI Ecosystem}
 
-This model is part of the complete Zen AI ecosystem:
+This is part of the complete Zen AI hypermodal ecosystem:
 
-\textbf{Language Models}:
-\begin{itemize}
-    \item zen-nano-0.6b: Lightweight edge model
-    \item zen-eco-4b-instruct: Efficient instruction-following
-    \item zen-eco-4b-thinking: Chain-of-thought reasoning
-    \item zen-agent-4b: Tool-calling with MCP support
-\end{itemize}
+\textbf{Language Models}: zen-nano-0.6b, zen-eco-4b-instruct, zen-eco-4b-thinking, zen-agent-4b
 
-\textbf{3D \& World Generation}:
-\begin{itemize}
-    \item zen-3d: Controllable 3D asset generation
-    \item zen-voyager: Camera-controlled world exploration
-    \item zen-world: Large-scale world simulation
-\end{itemize}
+\textbf{3D \& World}: zen-3d, zen-voyager, zen-world
 
-\textbf{Video Generation}:
-\begin{itemize}
-    \item zen-director-5b: Text/image-to-video
-    \item zen-video: Professional video synthesis
-    \item zen-video-i2v: Image-to-video animation
-\end{itemize}
+\textbf{Video}: zen-director-5b, zen-video, zen-video-i2v
 
-\textbf{Audio Generation}:
-\begin{itemize}
-    \item zen-musician-7b: Music generation from lyrics
-    \item zen-foley: Video-to-audio Foley effects
-\end{itemize}
+\textbf{Audio}: zen-musician-7b, zen-foley
+
+\textbf{Infrastructure}: Zen Gym (training), Zen Engine (inference)
 
 \section{Conclusion}
-
-We presented gym, demonstrating state-of-the-art performance.
-
-\subsection{Future Work}
-Continued optimization and feature development.
+Zen Gym unifies modern AI training methods in a single platform, achieving 2-5x speedup and 40-60\% memory reduction.
 
 \section*{Acknowledgments}
-
-Based on open-source contributions from the community.
-
 We thank the open-source community and our upstream contributors.
 
 \bibliographystyle{plain}
