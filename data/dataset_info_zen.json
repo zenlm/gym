@@ -1,0 +1,38 @@
+{
+  "zen_agentic_private": {
+    "hf_hub_url": "hanzoai/zen-agentic-dataset-private",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "observation_tag": "tool",
+      "system_tag": "system"
+    }
+  },
+  "zen_agentic_public": {
+    "hf_hub_url": "hanzoai/zen-agentic-dataset",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "zen_identity": {
+    "file_name": "zen_identity.json",
+    "formatting": "alpaca",
+    "columns": {
+      "prompt": "instruction",
+      "response": "output"
+    }
+  }
+}

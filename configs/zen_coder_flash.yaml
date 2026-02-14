@@ -1,0 +1,71 @@
+# Zen Coder Flash - GLM-4.7-Flash Training Config
+# 8x H200 141GB Configuration for Nebius AI Cloud
+# Dataset: zen-agentic-dataset-private (10.5B tokens)
+
+### Model ###
+model_name_or_path: zai-org/GLM-4.7-Flash
+trust_remote_code: true
+
+### Method ###
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_target: all  # Apply to all linear layers
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+
+### Dataset ###
+dataset: zen_agentic_private
+template: glm4
+cutoff_len: 32768  # Extended context for agentic data
+max_samples: 1000000  # Process 1M samples per epoch
+overwrite_cache: true
+preprocessing_num_workers: 32
+
+### Output ###
+output_dir: ./saves/zen-coder-flash/lora/sft
+logging_steps: 10
+save_steps: 500
+save_total_limit: 5
+plot_loss: true
+overwrite_output_dir: true
+
+### Training ###
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8  # Effective batch: 2*8*8 = 128
+num_train_epochs: 3.0
+learning_rate: 2.0e-5
+warmup_ratio: 0.03
+lr_scheduler_type: cosine
+weight_decay: 0.01
+max_grad_norm: 1.0
+
+### Distributed Training (8x H200) ###
+# Launch: torchrun --nproc_per_node 8 -m gym.train ...
+# Or: deepspeed --num_gpus 8 src/train.py --deepspeed configs/ds_z3_offload.json ...
+fsdp: full_shard auto_wrap
+fsdp_transformer_layer_cls_to_wrap: GLMBlock
+
+### Optimization ###
+bf16: true
+tf32: true
+flash_attn: fa2
+gradient_checkpointing: true
+ddp_timeout: 180000000
+
+### Evaluation ###
+val_size: 0.01
+per_device_eval_batch_size: 1
+eval_strategy: steps
+eval_steps: 500
+
+### Hugging Face ###
+push_to_hub: true
+hub_model_id: zenlm/zen-coder-flash
+hub_strategy: checkpoint
+hub_private_repo: false
+
+### Wandb ###
+report_to: wandb
+run_name: zen-coder-flash-8xH200
