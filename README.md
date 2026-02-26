@@ -100,7 +100,7 @@ llamafactory-cli train \
     --do_train \
     --model_name_or_path Zen/Zen 0.6B \
     --dataset your_dataset \
-    --template qwen3 \
+    --template zen \
     --finetuning_type lora \
     --lora_target all \
     --output_dir ./zen-nano-lora \
@@ -120,7 +120,7 @@ llamafactory-cli train \
     --do_train \
     --model_name_or_path Zen/Zen 4B \
     --dataset your_preference_dataset \
-    --template qwen3 \
+    --template zen \
     --finetuning_type lora \
     --output_dir ./zen-eco-grpo \
     --per_device_train_batch_size 2 \
@@ -135,7 +135,7 @@ llamafactory-cli train \
     --do_train \
     --model_name_or_path Zen/Zen 4B \
     --dataset your_dataset \
-    --template qwen3 \
+    --template zen \
     --finetuning_type lora \
     --quantization_bit 4 \
     --output_dir ./zen-eco-qlora \
@@ -161,7 +161,7 @@ Access at http://localhost:7860
 llamafactory-cli export \
     --model_name_or_path ./zen-eco-lora \
     --adapter_name_or_path ./zen-eco-lora \
-    --template qwen3 \
+    --template zen \
     --export_dir ./zen-eco-gguf \
     --export_size 4 \
     --export_quantization_bit 4 \
@@ -173,7 +173,7 @@ llamafactory-cli export \
 ### Zen Nano (0.6B)
 ```yaml
 model_name_or_path: Zen/Zen 0.6B
-template: qwen3
+template: zen
 finetuning_type: lora
 lora_rank: 64
 lora_alpha: 32
@@ -187,7 +187,7 @@ use_unsloth: true
 ### Zen Eco (4B)
 ```yaml
 model_name_or_path: Zen/Zen 4B
-template: qwen3
+template: zen
 finetuning_type: lora
 lora_rank: 128
 lora_alpha: 64
@@ -202,7 +202,7 @@ use_unsloth: true
 ```yaml
 model_name_or_path: Zen/Zen 4B
 dataset: Salesforce/xlam-function-calling-60k
-template: qwen3
+template: zen
 finetuning_type: lora
 lora_rank: 128
 lora_alpha: 64
@@ -328,13 +328,13 @@ tensorboard --logdir ./output
 # Deploy with vLLM
 llamafactory-cli api \
     --model_name_or_path ./zen-eco-lora \
-    --template qwen3 \
+    --template zen \
     --infer_backend vllm
 
 # Deploy with SGLang
 llamafactory-cli api \
     --model_name_or_path ./zen-eco-lora \
-    --template qwen3 \
+    --template zen \
     --infer_backend sglang
 ```
 
@@ -342,7 +342,7 @@ llamafactory-cli api \
 ```bash
 llamafactory-cli chat \
     --model_name_or_path ./zen-eco-lora \
-    --template qwen3
+    --template zen
 ```
 
 ## Quantization & Export
@@ -448,7 +448,7 @@ Training speed with various optimizations (zen-eco-4b):
 - **Official Docs**: https://gym.readthedocs.io/
 - **Examples**: [examples/](examples/)
 - **Training Configs**: [configs/](configs/)
-- **Zen Guide**: [configs/qwen3_training_guide.md](configs/qwen3_training_guide.md)
+- **Zen Guide**: [configs/zen_training_guide.md](configs/zen_training_guide.md)
 
 ## Credits
 
