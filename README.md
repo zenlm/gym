@@ -28,7 +28,7 @@ All Zen models are trained, fine-tuned, and optimized through Zen Gym's unified 
 - **QLoRA**: Quantized LoRA (2/3/4/5/6/8-bit via AQLM/AWQ/GPTQ/LLM.int8/HQQ/EETQ)
 - **DoRA**: Weight-Decomposed Low-Rank Adaptation
 - **GRPO**: Group Relative Policy Optimization (40-60% memory reduction)
-- **GSPO**: Group Sampled Policy Optimization (MoE stability for Qwen3)
+- **GSPO**: Group Sampled Policy Optimization (MoE stability for Zen)
 - **DPO**: Direct Preference Optimization
 - **PPO**: Proximal Policy Optimization
 - **KTO**: Kahneman-Tversky Optimization
@@ -68,11 +68,11 @@ All Zen models are trained, fine-tuned, and optimized through Zen Gym's unified 
 ### Supported Models
 
 Zen Gym natively supports:
-- **Qwen3** (0.6B, 4B, 7B, 14B, 30B) - Zen model foundation
-- LLaMA, Mistral, Mixtral-MoE, Gemma, DeepSeek, Yi, ChatGLM, Phi
-- Multimodal: Qwen2-VL, LLaVA, MiniCPM-o, InternVL
-- Audio: Qwen2-Audio, MiniCPM-o-2.6
-- Video: Wan2.2, Llama4
+- **Zen** (0.6B, 4B, 7B, 14B, 30B) - Zen model foundation
+- LLaMA, Zen, Mixtral-MoE, Gemma, DeepSeek, Yi, ChatGLM, Phi
+- Multimodal: Zen2-VL, LLaVA, MiniCPM-o, InternVL
+- Audio: Zen2-Audio, MiniCPM-o-2.6
+- Video: Zen Video, Llama4
 
 ## Installation
 
@@ -98,7 +98,7 @@ pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
 llamafactory-cli train \
     --stage sft \
     --do_train \
-    --model_name_or_path Qwen/Qwen3-0.6B \
+    --model_name_or_path Zen/Zen 0.6B \
     --dataset your_dataset \
     --template qwen3 \
     --finetuning_type lora \
@@ -118,7 +118,7 @@ llamafactory-cli train \
 llamafactory-cli train \
     --stage grpo \
     --do_train \
-    --model_name_or_path Qwen/Qwen3-4B \
+    --model_name_or_path Zen/Zen 4B \
     --dataset your_preference_dataset \
     --template qwen3 \
     --finetuning_type lora \
@@ -133,7 +133,7 @@ llamafactory-cli train \
 llamafactory-cli train \
     --stage sft \
     --do_train \
-    --model_name_or_path Qwen/Qwen3-4B \
+    --model_name_or_path Zen/Zen 4B \
     --dataset your_dataset \
     --template qwen3 \
     --finetuning_type lora \
@@ -172,7 +172,7 @@ llamafactory-cli export \
 
 ### Zen Nano (0.6B)
 ```yaml
-model_name_or_path: Qwen/Qwen3-0.6B
+model_name_or_path: Zen/Zen 0.6B
 template: qwen3
 finetuning_type: lora
 lora_rank: 64
@@ -186,7 +186,7 @@ use_unsloth: true
 
 ### Zen Eco (4B)
 ```yaml
-model_name_or_path: Qwen/Qwen3-4B
+model_name_or_path: Zen/Zen 4B
 template: qwen3
 finetuning_type: lora
 lora_rank: 128
@@ -200,7 +200,7 @@ use_unsloth: true
 
 ### Zen Agent (4B) - Tool Calling
 ```yaml
-model_name_or_path: Qwen/Qwen3-4B
+model_name_or_path: Zen/Zen 4B
 dataset: Salesforce/xlam-function-calling-60k
 template: qwen3
 finetuning_type: lora
@@ -268,7 +268,7 @@ flash_attn: fa2
 ### GSPO (Group Sampled Policy Optimization)
 - **Memory**: Similar to GRPO
 - **Speed**: Optimized for MoE models
-- **Quality**: Better stability for Qwen3-MoE
+- **Quality**: Better stability for Zen-MoE
 - **Best for**: Mixture-of-Experts models
 
 ```bash
@@ -448,7 +448,7 @@ Training speed with various optimizations (zen-eco-4b):
 - **Official Docs**: https://gym.readthedocs.io/
 - **Examples**: [examples/](examples/)
 - **Training Configs**: [configs/](configs/)
-- **Qwen3 Guide**: [configs/qwen3_training_guide.md](configs/qwen3_training_guide.md)
+- **Zen Guide**: [configs/qwen3_training_guide.md](configs/qwen3_training_guide.md)
 
 ## Credits
 
