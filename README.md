@@ -70,8 +70,8 @@ All Zen models are trained, fine-tuned, and optimized through Zen Gym's unified 
 Zen Gym natively supports:
 - **Zen** (0.6B, 4B, 7B, 14B, 30B) - Zen model foundation
 - LLaMA, Zen, Mixtral-MoE, Gemma, DeepSeek, Yi, ChatGLM, Phi
-- Multimodal: Zen2-VL, LLaVA, MiniCPM-o, InternVL
-- Audio: Zen2-Audio, MiniCPM-o-2.6
+- Multimodal: Zen-VL, LLaVA, MiniCPM-o, InternVL
+- Audio: Zen-Audio, MiniCPM-o-2.6
 - Video: Zen Video, Llama4
 
 ## Installation
