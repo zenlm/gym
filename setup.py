@@ -85,7 +85,7 @@ def main():
         url="https://github.com/zooai/gym",
         package_dir={"": "src"},
         packages=find_packages("src"),
-        python_requires=">=3.9.0",
+        python_requires=">=3.14",
         install_requires=get_requires(),
         extras_require=extra_require,
         entry_points={"console_scripts": get_console_scripts()},
