@@ -333,7 +333,7 @@ As a 501(c)(3) non-profit, we welcome contributions:
 - Tax-deductible donations at zoo.ngo/donate
 
 ## Technical Stack
-- **Core**: Python 3.9+, PyTorch 2.0+
+- **Core**: Python 3.14+, PyTorch 2.0+
 - **Training**: Transformers, PEFT, TRL, Accelerate
 - **Optimization**: Flash-Attention, Unsloth, Liger
 - **Quantization**: BitsAndBytes, GPTQ, AWQ
