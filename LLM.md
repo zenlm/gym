@@ -16,17 +16,17 @@ Democratize AI model training and fine-tuning, making advanced AI accessible to 
 ## Core Capabilities
 
 ### 1. Model Support (100+ Models)
-- **Qwen Series**: Qwen2.5 (0.5B-72B), Qwen3 (4B-72B), Qwen3-Omni (multimodal 30B)
+- ** Series**: (0.5B-72B), (4B-72B), -Omni (multimodal 30B)
 - **LLaMA Series**: LLaMA 2/3/3.1/3.2/3.3 (all sizes)
 - **Mistral/Mixtral**: Including MoE variants
-- **DeepSeek**: V2, V2.5, V3 models
+- ****: V2, V2.5, V3 models
 - **Yi Series**: 6B, 9B, 34B variants
 - **Gemma**: 2B, 7B, 9B, 27B models
 - **ChatGLM**: 6B, 9B models
 - **Phi Series**: Microsoft's efficient models
-- **Multimodal**: LLaVA, Qwen-VL, Qwen2-VL, Pixtral
-- **Code Models**: CodeQwen, DeepSeek-Coder, StarCoder
-- **Audio Models**: Qwen2-Audio, Qwen3-Omni (with audio)
+- **Multimodal**: LLaVA, -VL, -VL, Pixtral
+- **Code Models**: CodeQwen, -Coder, StarCoder
+- **Audio Models**: -Audio, -Omni (with audio)
 
 ### 2. Training Methods
 - **Full Fine-tuning**: Complete parameter updates
@@ -97,20 +97,20 @@ Democratize AI model training and fine-tuning, making advanced AI accessible to 
 └── LICENSE                # Apache 2.0 license
 ```
 
-## Qwen3 Integration
+## Integration
 
-### Supported Qwen3 Models
-1. **Standard Qwen3 Series**
-   - Qwen3-4B-Instruct (4B parameters)
-   - Qwen3-7B-Instruct (7B parameters)
-   - Qwen3-14B-Instruct (14B parameters)
-   - Qwen3-32B-Instruct (32B parameters)
-   - Qwen3-72B-Instruct (72B parameters)
+### Supported Models
+1. **Standard Series**
+ - -4B-Instruct (4B parameters)
+ - -7B-Instruct (7B parameters)
+ - -14B-Instruct (14B parameters)
+ - -32B-Instruct (32B parameters)
+ - -72B-Instruct (72B parameters)
 
-2. **Qwen3-Omni Multimodal Series** (30B with A3B architecture)
-   - Qwen3-Omni-30B-A3B-Instruct (vision + audio + text)
-   - Qwen3-Omni-30B-A3B-Thinking (reasoning chains)
-   - Qwen3-Omni-30B-A3B-Captioner (specialized captioning)
+2. **-Omni Multimodal Series** (30B with A3B architecture)
+ - -Omni-30B-A3B-Instruct (vision + audio + text)
+ - -Omni-30B-A3B-Thinking (reasoning chains)
+ - -Omni-30B-A3B-Captioner (specialized captioning)
 
 3. **Memory Requirements**
    - QLoRA (4-bit): 8-16GB VRAM for most models
@@ -127,10 +127,10 @@ Located in `configs/qwen3_finetune.yaml`:
 
 ### Key Scripts
 1. **scripts/train_qwen3.py**
-   - Comprehensive Qwen3 training
+ - Comprehensive training
    - Auto-detects hardware capabilities
    - Memory optimization for large models
-   - Supports all Qwen3 variants
+ - Supports all variants
 
 2. **scripts/train_qwen3_omni.py**
    - Specialized for multimodal models
@@ -299,8 +299,8 @@ run_sft(model_args, data_args, training_args, finetuning_args, generating_args)
 
 ### Recently Completed
 - ✅ Full rebrand from LLaMA Factory to Gym
-- ✅ Qwen3 comprehensive support
-- ✅ Qwen3-Omni multimodal integration
+- ✅ comprehensive support
+- ✅ -Omni multimodal integration
 - ✅ Hugging Face deployment ready
 - ✅ PyPI package as 'zoo-gym'
 
