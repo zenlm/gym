@@ -1,309 +1,237 @@
-"""
-Distributed training coordinator for multi-GPU/multi-node training.
-Implements FSDP with automatic mixed precision and failure recovery.
+"""Coordinator daemon.
+
+Runs on the DGX Spark (or whichever node has the best NIC). Receives canonical
+BF16 LoRA-delta blobs from workers each round; aggregates with DeltaSoup;
+serves the consensus delta back. Stateless w.r.t. the model weights themselves:
+workers hold their own copies and just apply the consensus delta locally.
+
+Run:
+    python -m gym.distributed.hetero.coordinator --lab zen5/lab.yaml --bind 0.0.0.0:8443
+
+Or programmatically:
+    Coordinator(lab).serve()
 """
 
-import os
+from __future__ import annotations
+
+import argparse
+import io
 import json
-import socket
 import logging
-import signal
-import functools
-from typing import Optional, Dict, Any, List
-from dataclasses import dataclass
-from datetime import datetime
+import struct
+import threading
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
 
-import torch
-import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel as DDP
-from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
-from torch.distributed.fsdp import (
-    FullStateDictConfig,
-    StateDictType,
-    CPUOffload,
-    BackwardPrefetch,
-    ShardingStrategy,
-)
-from torch.distributed.fsdp.wrap import (
-    size_based_auto_wrap_policy,
-    transformer_auto_wrap_policy,
-)
+import numpy as np
 
-logger = logging.getLogger(__name__)
+from .scheduler import Assignment, Scheduler
+from .topology import Lab
+from .transport import make_server
+
+log = logging.getLogger(__name__)
+
+
+# ── DeltaSoup-style aggregation (without the full reputation system) ────────
+
+
+def _decode(blob: bytes) -> tuple[dict, dict]:
+    """Returns (header, tensors_as_np_uint16). Stays in uint16 so we can
+    aggregate cheaply on CPU on the coordinator.
+    """
+    hdr_len = struct.unpack_from("<Q", blob, 0)[0]
+    hdr = json.loads(blob[8:8 + hdr_len])
+    base = 8 + hdr_len
+    tensors: dict[str, np.ndarray] = {}
+    for name, meta in hdr.items():
+        s, e = meta["offsets"]
+        u16 = np.frombuffer(blob[base + s: base + e], dtype=np.uint16).reshape(meta["shape"])
+        tensors[name] = u16.copy()                          # detach from blob memory
+    return hdr, tensors
+
+
+def _bf16_to_f32(u16: np.ndarray) -> np.ndarray:
+    return (u16.astype(np.uint32) << 16).view(np.float32)
+
+
+def _f32_to_bf16(f32: np.ndarray) -> np.ndarray:
+    return (f32.view(np.uint32) >> 16).astype(np.uint16)
+
+
+def _encode(tensors: dict[str, np.ndarray]) -> bytes:
+    hdr: dict[str, dict] = {}
+    body = io.BytesIO()
+    offset = 0
+    for name, u16 in tensors.items():
+        raw = u16.tobytes()
+        hdr[name] = {"dtype": "BF16", "shape": list(u16.shape),
+                     "offsets": [offset, offset + len(raw)]}
+        body.write(raw)
+        offset += len(raw)
+    hdr_json = json.dumps(hdr, separators=(",", ":")).encode()
+    return struct.pack("<Q", len(hdr_json)) + hdr_json + body.getvalue()
+
+
+def aggregate(deltas: list[dict[str, np.ndarray]], method: str = "byzantine_robust") -> dict[str, np.ndarray]:
+    """Combine N worker deltas into one consensus delta.
+
+    byzantine_robust: trimmed-mean over the f32 view, robust to one bad worker.
+    mean: plain average.
+    median: per-element median.
+    """
+    names = list(deltas[0].keys())
+    out: dict[str, np.ndarray] = {}
+    for name in names:
+        stack = np.stack([_bf16_to_f32(d[name]) for d in deltas], axis=0)  # [N, ...]
+        if method == "median":
+            agg = np.median(stack, axis=0)
+        elif method == "byzantine_robust":
+            # Drop top and bottom 1 if N >= 4 — classic trimmed mean.
+            n = stack.shape[0]
+            if n >= 4:
+                sorted_ = np.sort(stack, axis=0)
+                agg = sorted_[1:-1].mean(axis=0)
+            else:
+                agg = stack.mean(axis=0)
+        else:
+            agg = stack.mean(axis=0)
+        out[name] = _f32_to_bf16(agg)
+    return out
+
+
+# ── coordinator state ───────────────────────────────────────────────────────
 
 
 @dataclass
-class DistributedConfig:
-    """Configuration for distributed training."""
-    backend: str = "nccl"
-    world_size: int = 1
-    rank: int = 0
-    local_rank: int = 0
-    master_addr: str = "localhost"
-    master_port: int = 29500
-    use_fsdp: bool = False
-    fsdp_min_params: int = 1e6
-    fsdp_cpu_offload: bool = False
-    mixed_precision: bool = True
-    gradient_checkpointing: bool = False
-    find_unused_parameters: bool = False
-
-    @classmethod
-    def from_env(cls) -> "DistributedConfig":
-        """Initialize from environment variables."""
-        return cls(
-            world_size=int(os.environ.get("WORLD_SIZE", 1)),
-            rank=int(os.environ.get("RANK", 0)),
-            local_rank=int(os.environ.get("LOCAL_RANK", 0)),
-            master_addr=os.environ.get("MASTER_ADDR", "localhost"),
-            master_port=int(os.environ.get("MASTER_PORT", 29500)),
-        )
+class _Round:
+    round_id: int
+    expected: set[str]
+    received: dict[str, bytes] = field(default_factory=dict)
+    losses: dict[str, float] = field(default_factory=dict)
+    aggregate: Optional[bytes] = None
+    started_at: float = field(default_factory=time.time)
+    completed_at: Optional[float] = None
 
 
-class DistributedCoordinator:
-    """Coordinates distributed training across multiple GPUs/nodes."""
+class CoordinatorState:
+    def __init__(self, lab: Lab):
+        self.lab = lab
+        self.scheduler = Scheduler(lab)
+        self.assignment: Assignment = self.scheduler.plan()
+        self.rounds: dict[int, _Round] = {}
+        self._lock = threading.Lock()
+        self.method = lab.aggregation
+        log.info("coordinator initialized — %d workers expected", len(lab.workers))
+        log.info("data weights: %s", self.assignment.data_weights)
 
-    def __init__(self, config: Optional[DistributedConfig] = None):
-        self.config = config or DistributedConfig.from_env()
-        self.is_distributed = self.config.world_size > 1
-        self.is_main_process = self.config.rank == 0
-        self._setup_logging()
-        self._health_check_counter = 0
-
-    def _setup_logging(self):
-        """Configure logging for distributed training."""
-        log_level = logging.INFO if self.is_main_process else logging.WARNING
-        logging.basicConfig(
-            level=log_level,
-            format=f'[Rank {self.config.rank}] %(asctime)s - %(name)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
-
-    def initialize(self) -> bool:
-        """Initialize distributed process group."""
-        if not self.is_distributed:
-            logger.info("Running in single-process mode")
-            return True
-
-        try:
-            # Set device
-            torch.cuda.set_device(self.config.local_rank)
-
-            # Initialize process group
-            dist.init_process_group(
-                backend=self.config.backend,
-                init_method=f"tcp://{self.config.master_addr}:{self.config.master_port}",
-                world_size=self.config.world_size,
-                rank=self.config.rank
-            )
-
-            # Register signal handlers
-            signal.signal(signal.SIGTERM, self._shutdown_handler)
-            signal.signal(signal.SIGINT, self._shutdown_handler)
-
-            logger.info(f"Initialized distributed training: rank={self.config.rank}/{self.config.world_size}")
-            return True
-
-        except Exception as e:
-            logger.error(f"Failed to initialize distributed training: {e}")
-            return False
-
-    def wrap_model(self, model: torch.nn.Module, **kwargs) -> torch.nn.Module:
-        """Wrap model for distributed training with FSDP or DDP."""
-        if not self.is_distributed:
-            return model.cuda() if torch.cuda.is_available() else model
-
-        device = torch.device(f"cuda:{self.config.local_rank}")
-        model = model.to(device)
-
-        if self.config.use_fsdp:
-            return self._wrap_fsdp(model, **kwargs)
-        else:
-            return self._wrap_ddp(model, **kwargs)
-
-    def _wrap_fsdp(self, model: torch.nn.Module, **kwargs) -> FSDP:
-        """Wrap model with Fully Sharded Data Parallel."""
-        # Configure auto wrap policy
-        auto_wrap_policy = functools.partial(
-            size_based_auto_wrap_policy,
-            min_num_params=self.config.fsdp_min_params
-        )
-
-        # Configure CPU offload
-        cpu_offload = CPUOffload(offload_params=True) if self.config.fsdp_cpu_offload else None
-
-        # Configure mixed precision
-        mixed_precision_config = None
-        if self.config.mixed_precision:
-            from torch.distributed.fsdp import MixedPrecision
-            mixed_precision_config = MixedPrecision(
-                param_dtype=torch.bfloat16,
-                reduce_dtype=torch.bfloat16,
-                buffer_dtype=torch.bfloat16,
-            )
-
-        # Wrap with FSDP
-        model = FSDP(
-            model,
-            auto_wrap_policy=auto_wrap_policy,
-            cpu_offload=cpu_offload,
-            mixed_precision=mixed_precision_config,
-            sharding_strategy=ShardingStrategy.FULL_SHARD,
-            backward_prefetch=BackwardPrefetch.BACKWARD_PRE,
-            device_id=self.config.local_rank,
-            **kwargs
-        )
-
-        logger.info("Model wrapped with FSDP")
-        return model
-
-    def _wrap_ddp(self, model: torch.nn.Module, **kwargs) -> DDP:
-        """Wrap model with Distributed Data Parallel."""
-        model = DDP(
-            model,
-            device_ids=[self.config.local_rank],
-            output_device=self.config.local_rank,
-            find_unused_parameters=self.config.find_unused_parameters,
-            **kwargs
-        )
-        logger.info("Model wrapped with DDP")
-        return model
-
-    def barrier(self):
-        """Synchronize all processes."""
-        if self.is_distributed:
-            dist.barrier()
-
-    def all_reduce(self, tensor: torch.Tensor, op=dist.ReduceOp.SUM) -> torch.Tensor:
-        """All-reduce tensor across all processes."""
-        if not self.is_distributed:
-            return tensor
-        dist.all_reduce(tensor, op=op)
-        return tensor
-
-    def all_gather(self, tensor: torch.Tensor) -> List[torch.Tensor]:
-        """Gather tensor from all processes."""
-        if not self.is_distributed:
-            return [tensor]
-
-        world_size = self.config.world_size
-        gathered = [torch.zeros_like(tensor) for _ in range(world_size)]
-        dist.all_gather(gathered, tensor)
-        return gathered
-
-    def broadcast(self, tensor: torch.Tensor, src: int = 0) -> torch.Tensor:
-        """Broadcast tensor from source rank."""
-        if self.is_distributed:
-            dist.broadcast(tensor, src=src)
-        return tensor
-
-    def health_check(self) -> Dict[str, Any]:
-        """Perform health check on distributed setup."""
-        health = {
-            "timestamp": datetime.now().isoformat(),
-            "rank": self.config.rank,
-            "world_size": self.config.world_size,
-            "hostname": socket.gethostname(),
-            "cuda_available": torch.cuda.is_available(),
+    def topology_view(self) -> dict:
+        return {
+            "workers": [
+                {"name": n.name, "host": n.host, "backend": n.backend_hint,
+                 "memory_gb": n.memory_gb, "pin_experts": list(n.pin_experts)}
+                for n in self.lab.workers
+            ],
+            "data_weights": self.assignment.data_weights,
+            "expert_pins": {k: list(v) for k, v in self.assignment.expert_pins.items()},
+            "aggregation": self.method,
+            "sync_interval_steps": self.lab.sync_interval_steps,
         }
 
-        if torch.cuda.is_available():
-            health.update({
-                "gpu_count": torch.cuda.device_count(),
-                "current_device": torch.cuda.current_device(),
-                "device_name": torch.cuda.get_device_name(),
-                "memory_allocated": torch.cuda.memory_allocated(),
-                "memory_reserved": torch.cuda.memory_reserved(),
-            })
+    def metrics(self) -> dict:
+        """Single JSON surface for hanzo desktop + cloud telemetry."""
+        with self._lock:
+            rounds = []
+            for rid in sorted(self.rounds.keys())[-50:]:     # last 50 rounds
+                r = self.rounds[rid]
+                rounds.append({
+                    "round_id": r.round_id,
+                    "expected": sorted(r.expected),
+                    "received": sorted(r.received.keys()),
+                    "losses": dict(r.losses),
+                    "aggregated": r.aggregate is not None,
+                    "started_at": r.started_at,
+                    "completed_at": r.completed_at,
+                    "duration_s": (r.completed_at - r.started_at) if r.completed_at else None,
+                })
+            return {
+                "topology": self.topology_view(),
+                "rounds": rounds,
+                "current_round": max(self.rounds.keys()) if self.rounds else -1,
+            }
 
-        # Test communication
-        if self.is_distributed:
-            try:
-                test_tensor = torch.tensor([self.config.rank], device='cuda')
-                gathered = self.all_gather(test_tensor)
-                health["communication_ok"] = len(gathered) == self.config.world_size
-            except Exception as e:
-                health["communication_ok"] = False
-                health["communication_error"] = str(e)
+    def put_delta(self, round_id: int, worker: str, blob: bytes) -> None:
+        with self._lock:
+            r = self.rounds.get(round_id)
+            if r is None:
+                expected = {n.name for n in self.lab.workers}
+                r = _Round(round_id=round_id, expected=expected)
+                self.rounds[round_id] = r
+            r.received[worker] = blob
+            log.info("round %d: %s/%s received from %s (%d bytes)",
+                     round_id, len(r.received), len(r.expected), worker, len(blob))
+            if r.received.keys() == r.expected and r.aggregate is None:
+                self._aggregate_locked(r)
 
-        self._health_check_counter += 1
-        health["check_count"] = self._health_check_counter
+    def get_aggregate(self, round_id: int) -> bytes:
+        with self._lock:
+            r = self.rounds.get(round_id)
+            if r and r.aggregate is not None:
+                return r.aggregate
+        # Block briefly until ready (caller is a worker waiting on the bus).
+        for _ in range(600):
+            time.sleep(1)
+            with self._lock:
+                r = self.rounds.get(round_id)
+                if r and r.aggregate is not None:
+                    return r.aggregate
+        raise TimeoutError(f"round {round_id} not aggregated within 10 min")
 
-        return health
+    def end_round(self, round_id: int, worker: str, payload: dict) -> None:
+        with self._lock:
+            r = self.rounds.get(round_id)
+            if r is None: return
+            if "loss" in payload: r.losses[worker] = float(payload["loss"])
 
-    def save_checkpoint(self, model: torch.nn.Module, checkpoint_dir: str, **kwargs):
-        """Save model checkpoint (only on main process)."""
-        if not self.is_main_process:
-            return
-
-        os.makedirs(checkpoint_dir, exist_ok=True)
-
-        if isinstance(model, FSDP):
-            # Save FSDP checkpoint
-            with FSDP.state_dict_type(
-                model,
-                StateDictType.FULL_STATE_DICT,
-                FullStateDictConfig(offload_to_cpu=True, rank0_only=True),
-            ):
-                state_dict = model.state_dict()
-                if self.is_main_process:
-                    torch.save({
-                        'model_state_dict': state_dict,
-                        'config': self.config.__dict__,
-                        **kwargs
-                    }, os.path.join(checkpoint_dir, 'checkpoint.pt'))
-        else:
-            # Save regular checkpoint
-            state_dict = model.module.state_dict() if hasattr(model, 'module') else model.state_dict()
-            torch.save({
-                'model_state_dict': state_dict,
-                'config': self.config.__dict__,
-                **kwargs
-            }, os.path.join(checkpoint_dir, 'checkpoint.pt'))
-
-        logger.info(f"Checkpoint saved to {checkpoint_dir}")
-
-    def load_checkpoint(self, model: torch.nn.Module, checkpoint_path: str) -> Dict[str, Any]:
-        """Load model checkpoint."""
-        checkpoint = torch.load(checkpoint_path, map_location='cpu')
-
-        if isinstance(model, FSDP):
-            with FSDP.state_dict_type(
-                model,
-                StateDictType.FULL_STATE_DICT,
-                FullStateDictConfig(offload_to_cpu=True, rank0_only=False),
-            ):
-                model.load_state_dict(checkpoint['model_state_dict'])
-        else:
-            if hasattr(model, 'module'):
-                model.module.load_state_dict(checkpoint['model_state_dict'])
-            else:
-                model.load_state_dict(checkpoint['model_state_dict'])
-
-        logger.info(f"Checkpoint loaded from {checkpoint_path}")
-        return checkpoint
-
-    def cleanup(self):
-        """Clean up distributed resources."""
-        if self.is_distributed:
-            dist.destroy_process_group()
-            logger.info("Distributed process group destroyed")
-
-    def _shutdown_handler(self, signum, frame):
-        """Handle shutdown signals gracefully."""
-        logger.info(f"Received signal {signum}, shutting down...")
-        self.cleanup()
-        exit(0)
-
-    def __enter__(self):
-        """Context manager entry."""
-        self.initialize()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit."""
-        self.cleanup()
+    def _aggregate_locked(self, r: _Round) -> None:
+        log.info("round %d: aggregating %d deltas", r.round_id, len(r.received))
+        decoded = [_decode(b)[1] for b in r.received.values()]
+        agg = aggregate(decoded, method=self.method)
+        r.aggregate = _encode(agg)
+        r.completed_at = time.time()
+        log.info("round %d: done in %.1fs", r.round_id, r.completed_at - r.started_at)
 
 
-# Export main components
-__all__ = ['DistributedConfig', 'DistributedCoordinator']
+# ── entry point ─────────────────────────────────────────────────────────────
+
+
+class Coordinator:
+    def __init__(self, lab: Lab):
+        self.state = CoordinatorState(lab)
+
+    def serve(self, bind: tuple[str, int] = ("0.0.0.0", 8443)) -> None:
+        secrets = {n.name: n.auth_token for n in self.state.lab.workers if n.auth_token}
+        server = make_server(self.state, secrets, bind)
+        log.info("coordinator listening on %s:%s", *bind)
+        server.serve_forever()
+
+
+def main(argv: list[str] | None = None) -> None:
+    p = argparse.ArgumentParser(description="zen federated coordinator")
+    p.add_argument("--lab", required=True, help="path to lab.yaml")
+    p.add_argument("--bind", default="0.0.0.0:8443", help="host:port")
+    p.add_argument("--log-level", default="INFO")
+    args = p.parse_args(argv)
+
+    logging.basicConfig(
+        level=args.log_level,
+        format="%(asctime)s [%(levelname)s] %(name)s %(message)s",
+    )
+    lab = Lab.from_yaml(args.lab)
+    host, port = args.bind.split(":")
+    Coordinator(lab).serve((host, int(port)))
+
+
+if __name__ == "__main__":
+    main()
