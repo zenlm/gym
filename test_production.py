@@ -15,7 +15,8 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from gym.distributed import DistributedConfig, DistributedCoordinator
+from gym.distributed import Coordinator, Lab, Node, NodeRole, Worker
+from gym.backend import detect
 from gym.monitoring import MetricsCollector, TrainingMonitor
 from gym.registry import ModelRegistry, ModelStatus
 from gym.tuning import (
@@ -45,29 +46,23 @@ class SimpleModel(nn.Module):
 
 
 def test_distributed_training():
-    """Test distributed training coordinator."""
-    print("\n=== Testing Distributed Training ===")
+    """Test federation coordinator + backend detection.
 
-    # Initialize coordinator
-    config = DistributedConfig(use_fsdp=False, mixed_precision=True)
-    coordinator = DistributedCoordinator(config)
+    Hetero federation replaced the old NCCL/FSDP coordinator — one way only.
+    """
+    print("\n=== Testing Federation ===")
 
-    # Initialize distributed training
-    if coordinator.initialize():
-        print(f"✓ Distributed coordinator initialized (rank={config.rank})")
+    backend = detect()
+    print(f"✓ Backend detected: {backend.name} ({backend.memory_gb}GB, {backend.effective_tflops} TFLOPS)")
 
-    # Create and wrap model
-    model = SimpleModel()
-    model = coordinator.wrap_model(model)
-    print("✓ Model wrapped for distributed training")
-
-    # Health check
-    health = coordinator.health_check()
-    print(f"✓ Health check: {health['cuda_available']=}, {health.get('communication_ok', True)=}")
-
-    # Cleanup
-    coordinator.cleanup()
-    print("✓ Distributed resources cleaned up")
+    lab = Lab(nodes=(
+        Node(name="local", host="127.0.0.1", role=NodeRole.HYBRID,
+             backend_hint=backend.name, memory_gb=backend.memory_gb,
+             nic_gbps=10, tflops_hint=backend.effective_tflops),
+    ))
+    coord = Coordinator(lab)
+    print(f"✓ Coordinator initialized: {len(lab.workers)} worker(s)")
+    print(f"✓ Data weights: {coord.state.assignment.data_weights}")
 
 
 def test_metrics_monitoring():
@@ -282,19 +277,15 @@ def test_integration():
     """Test integration of all components."""
     print("\n=== Testing Full Integration ===")
 
-    # Setup components
-    coordinator = DistributedCoordinator(DistributedConfig())
+    # Setup components — federation replaces the old NCCL coordinator,
+    # so this test trains locally and registers the result.
+    backend = detect()
     metrics = MetricsCollector(log_dir="./test_integration/logs")
     registry = ModelRegistry(base_path="./test_integration/registry")
     ckpt_manager = CheckpointManager(checkpoint_dir="./test_integration/checkpoints")
     monitor = TrainingMonitor(metrics)
 
-    # Initialize
-    coordinator.initialize()
-
-    # Create and wrap model
-    model = SimpleModel()
-    model = coordinator.wrap_model(model)
+    model = SimpleModel().to(backend.device)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # Training loop simulation
@@ -340,8 +331,6 @@ def test_integration():
     registry.update_status(model_id, ModelStatus.PRODUCTION)
     print(f"✓ Model registered and promoted to production: {model_id}")
 
-    # Cleanup
-    coordinator.cleanup()
     metrics.close()
     print("✓ Integration test completed successfully")
 

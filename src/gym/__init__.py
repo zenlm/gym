@@ -25,7 +25,12 @@ Use modelscope: USE_MODELSCOPE_HUB=1
 Use openmind: USE_OPENMIND_HUB=1
 """
 
-from .extras.env import VERSION
-
-
-__version__ = VERSION
+# VERSION import requires the full training stack (accelerate, transformers, ...).
+# Federation primitives (gym.backend, gym.distributed.hetero) only need numpy +
+# stdlib, so make the version import lazy — federation users on bare boxes
+# shouldn't be forced to install the full training deps.
+try:
+    from .extras.env import VERSION
+    __version__ = VERSION
+except ImportError:
+    __version__ = "0.0.0+federation-only"
