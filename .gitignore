@@ -185,3 +185,8 @@ CLAUDE.md
 GEMINI.md
 GROK.md
 QWEN.md
+
+# Node
+node_modules/
+.next/
+out/
